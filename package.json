@@ -2,7 +2,7 @@
   "name": "ep-employee-details",
   "version": "1.0.0",
   "description": "Hyniva Employee portal ",
-  "main": "index.js",
+  "main": "employeeHandler.js",
   "directories": {
     "test": "test"
   },
