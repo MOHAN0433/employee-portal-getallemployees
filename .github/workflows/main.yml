@@ -1,4 +1,4 @@
-name: upload file to s3 API
+name: upload file to employee portal API
 # Controls when the action will run. Triggers the workflow on push or pull request
 # events but only for the main branch
 on:

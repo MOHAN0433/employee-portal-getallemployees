@@ -38,7 +38,7 @@ resources:
     EmployeeTable:
       Type: AWS::DynamoDB::Table
       Properties:
-        TableName: ${self:custom.employeeTable}
+        TableName: ${self:custom.employeeTableName}
         AttributeDefinitions:
           - AttributeName: empId
             AttributeType: S

@@ -16,7 +16,7 @@ const getAllEmployees = async () => {
     //const resource = event.resource;---
     try {
         const { Items } = await client.send(
-          new ScanCommand({ TableName: process.env.DYNAMODB_TABLE_NAME })
+          new ScanCommand({ TableName: process.env.EMPLOYEE_TABLE })
         ); // Getting table name from the servetless.yml and setting to the TableName
 
         if (Items.length === 0) {
