@@ -14,7 +14,7 @@ const {
 const getAllEmployees = async () => {
     const response = { statusCode: 200 };
 
-    
+
     //const resource = event.resource;
     try {
         const { Items } = await client.send(
@@ -28,10 +28,11 @@ const getAllEmployees = async () => {
             message: "Employee details not found.",
           }); // Setting error message
         } else {
+          const sortedItems = Items.sort((a, b) => a.empId.localeCompare(b.empId));
           // If employee details found in the dynamoDB setting the data
           response.body = JSON.stringify({
             message: "Successfully retrieved all Employees details.",
-            data: Items.map((item) => unmarshall(item)), // A DynamoDB record into a JavaScript object and setting to the data
+            data: sortedItems.map((item) => unmarshall(item)), // A DynamoDB record into a JavaScript object and setting to the data
           });
         }
       } catch (e) {
