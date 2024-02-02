@@ -28,7 +28,7 @@ const getAllEmployees = async () => {
             message: "Employee details not found.",
           }); // Setting error message
         } else {
-          const sortedItems = Items.sort((a, b) => a.empId.localeCompare(b.empId));
+          const sortedItems = Items.sort((a, b) => a.empId - b.empId);
           // If employee details found in the dynamoDB setting the data
           response.body = JSON.stringify({
             message: "Successfully retrieved all Employees details.",
