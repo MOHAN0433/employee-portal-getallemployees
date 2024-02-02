@@ -14,6 +14,7 @@ const {
 const getAllEmployees = async () => {
     const response = { statusCode: 200 };
     //const resource = event.resource;---
+    
     try {
         const { Items } = await client.send(
           new ScanCommand({ TableName: process.env.EMPLOYEE_TABLE })
