@@ -11,7 +11,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "EP-EMPLOYEE-DETAILS"
+    "url": "employee-portal-getallemployees"
   },
   "author": "Hyniva",
   "license": "ISC",
