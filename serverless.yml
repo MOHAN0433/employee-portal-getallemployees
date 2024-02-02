@@ -1,0 +1,51 @@
+service: employee-portal-service-detials
+provider:
+  name: aws
+  runtime: nodejs18.x
+  stage: dev
+  region: ap-south-1
+  environment:
+    EMPLOYEE_TABLE: ${self:custom.employeeTableName}
+custom:
+  employeeTableName: employee-portal-Details-${self:provider.stage}
+plugins:
+  - serverless-iam-roles-per-function
+package:
+    individually: true
+functions:
+  employeeGetAll:
+    handler: src/Lamda/employee/employeeHandler.employee
+    name: employeeGetAll
+    memorySize: 512
+    timeout: 120
+    events:
+      - http:
+          path: employee
+          method: GET
+    iamRoleStatements:
+      - Effect: "Allow"
+        Action:
+          - "dynamodb:PutItem"
+          - "dynamodb:UpdateItem"
+          - "dynamodb:GetItem"
+          - "dynamodb:Scan"
+          - "dynamodb:DeleteItem"
+        Resource:
+          - !GetAtt EmployeeTable.Arn
+
+resources:
+  Resources:
+    EmployeeTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:custom.employeeTable}
+        AttributeDefinitions:
+          - AttributeName: empId
+            AttributeType: S
+        KeySchema:
+          - AttributeName: empId
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        
