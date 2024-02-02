@@ -16,6 +16,9 @@
   "author": "Hyniva",
   "license": "ISC",
   "dependencies": {
-    "aws-sdk": "^2.1547.0"
+    "@aws-sdk/client-dynamodb": "^3.504.0",
+    "@aws-sdk/util-dynamodb": "^3.504.0",
+    "aws-sdk": "^2.1547.0",
+    "serverless-iam-roles-per-function": "^3.2.0"
   }
 }
