@@ -2,7 +2,7 @@
   "name": "ep-employee-details",
   "version": "1.0.0",
   "description": "Hyniva Employee portal ",
-  "main": "employeeHandler.js",
+  "main": "emloyeeHandler.js",
   "directories": {
     "test": "test"
   },
@@ -11,14 +11,11 @@
   },
   "repository": {
     "type": "git",
-    "url": "employee-portal-getallemployees"
+    "url": "EP-EMPLOYEE-DETAILS"
   },
   "author": "Hyniva",
   "license": "ISC",
   "dependencies": {
-    "@aws-sdk/client-dynamodb": "^3.504.0",
-    "@aws-sdk/util-dynamodb": "^3.504.0",
-    "aws-sdk": "^2.1547.0",
-    "serverless-iam-roles-per-function": "^3.2.0"
+    "aws-sdk": "^2.1547.0"
   }
 }

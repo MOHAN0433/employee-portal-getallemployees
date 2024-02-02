@@ -13,10 +13,10 @@ const {
 
 const getAllEmployees = async () => {
     const response = { statusCode: 200 };
-    //const resource = event.resource;--- 
+    //const resource = event.resource;
     try {
         const { Items } = await client.send(
-          new ScanCommand({ TableName: process.env.EMPLOYEE_TABLE })
+          new ScanCommand({ TableName: process.env.DYNAMODB_TABLE_NAME })
         ); // Getting table name from the servetless.yml and setting to the TableName
 
         if (Items.length === 0) {
@@ -32,7 +32,6 @@ const getAllEmployees = async () => {
             data: Items.map((item) => unmarshall(item)), // A DynamoDB record into a JavaScript object and setting to the data
           });
         }
-
       } catch (e) {
         // If any errors will occurred
         console.error(e);

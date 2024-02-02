@@ -1,4 +1,4 @@
-service: employee-portal-service-detials
+service: employee-portal-service
 provider:
   name: aws
   runtime: nodejs18.x
@@ -7,14 +7,14 @@ provider:
   environment:
     EMPLOYEE_TABLE: ${self:custom.employeeTableName}
 custom:
-  employeeTableName: employee-portal-Details-${self:provider.stage}
+  employeeTableName: employee-Details-${self:provider.stage}
 plugins:
   - serverless-iam-roles-per-function
 package:
     individually: true
 functions:
   employeeGetAll:
-    handler: src/lamda/employeeHandler.getAllEmployees
+    handler: src/Lamda/employee/employeeHandler.employee
     name: employeeGetAll
     memorySize: 512
     timeout: 120
@@ -22,6 +22,15 @@ functions:
       - http:
           path: employee
           method: GET
+  # employeeCreate:
+  #   handler: src/Lamda/employee/employeeHandler.getAllEmployees
+  #   name: employeeCreate
+  #   memorySize: 512
+  #   timeout: 120
+  #   events:
+  #     - http:
+  #         path: employee
+  #         method: POST
     iamRoleStatements:
       - Effect: "Allow"
         Action:
@@ -38,7 +47,7 @@ resources:
     EmployeeTable:
       Type: AWS::DynamoDB::Table
       Properties:
-        TableName: ${self:custom.employeeTableName}
+        TableName: ${self:custom.employeeTable}
         AttributeDefinitions:
           - AttributeName: empId
             AttributeType: S
