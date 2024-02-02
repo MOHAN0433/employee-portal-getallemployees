@@ -28,15 +28,23 @@ const getAllEmployees = async () => {
             message: "Employee details not found.",
           }); // Setting error message
         } else {
-          console.log('Items from DynamoDB:', Items);
           const sortedItems = Items.sort((a, b) => a.empId.S.localeCompare(b.empId.S));
-          // If employee details found in the dynamoDB setting the data
-          response.body = JSON.stringify({
-            message: "Successfully retrieved all Employees details.",
-            data: sortedItems.map((item) => unmarshall(item)), // A DynamoDB record into a JavaScript object and setting to the data
-          });
+
+      // Map and set "password" field to null
+      const employeesData = sortedItems.map((item) => {
+        const employee = unmarshall(item);
+        if (employee.hasOwnProperty('password')) {
+          employee.password = null;
         }
-      } catch (e) {
+        return employee;
+      });
+
+      response.body = JSON.stringify({
+        message: "Successfully retrieved all Employees details.",
+        data: employeesData,
+      });
+    }
+  } catch (e) {
         // If any errors will occurred
         console.error(e);
         response.body = JSON.stringify({
