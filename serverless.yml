@@ -10,8 +10,9 @@ custom:
   employeeTableName: employee-Details-${self:provider.stage}
 plugins:
   - serverless-iam-roles-per-function
+  - serverless-offline  # Add this line to include the serverless-offline plugin
 package:
-    individually: true
+  individually: true
 functions:
   employeeGetAll:
     handler: src/Lamda/employee/employeeHandler.getAllEmployees
@@ -22,15 +23,6 @@ functions:
       - http:
           path: employee
           method: GET
-  # employeeCreate:
-  #   handler: src/Lamda/employee/employeeHandler.getAllEmployees
-  #   name: employeeCreate
-  #   memorySize: 512
-  #   timeout: 120
-  #   events:
-  #     - http:
-  #         path: employee
-  #         method: POST
     iamRoleStatements:
       - Effect: "Allow"
         Action:
@@ -57,4 +49,3 @@ resources:
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
-        
