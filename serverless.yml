@@ -1,4 +1,5 @@
 service: employee-portal-service
+
 provider:
   name: aws
   runtime: nodejs18.x
@@ -16,7 +17,6 @@ provider:
         - "dynamodb:DeleteItem"
       Resource:
         - !GetAtt EmployeeTable.Arn
-    # Add IAM permissions for the assignments table if needed
 
 custom:
   employeeTableName: employee-Details-${self:provider.stage}
@@ -35,6 +35,7 @@ functions:
       - http:
           path: employee/{employeeId}
           method: GET
+
   employeeCreate:
     handler: src/Lamda/employee/employeeHandler.createEmployee
     name: employeeCreate
@@ -44,6 +45,7 @@ functions:
       - http:
           path: employee
           method: POST
+
   employeeGetAll:
     handler: src/Lamda/employee/employeeHandler.getAllEmployees
     name: employeeGetAll
