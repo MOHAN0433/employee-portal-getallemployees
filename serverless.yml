@@ -2,9 +2,9 @@ service: employee-portal-service
 
 provider:
   name: aws
-  runtime: nodejs18.x
+  runtime: nodejs14.x
   stage: dev
-  region: us-east-2
+  region: us-west-2
   environment:
     EMPLOYEE_TABLE: ${self:custom.employeeTableName}
   iamRoleStatements:
@@ -15,7 +15,6 @@ provider:
         - "dynamodb:GetItem"
         - "dynamodb:Scan"
         - "dynamodb:DeleteItem"
-        - "dynamodb:CreateTable" 
       Resource:
         - !GetAtt EmployeeTable.Arn
 
