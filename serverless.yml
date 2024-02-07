@@ -6,34 +6,48 @@ provider:
   region: us-east-1
   environment:
     EMPLOYEE_TABLE: ${self:custom.employeeTableName}
+  iamRoleStatements:
+    - Effect: "Allow"
+      Action:
+        - "dynamodb:PutItem"
+        - "dynamodb:UpdateItem"
+        - "dynamodb:GetItem"
+        - "dynamodb:Scan"
+        - "dynamodb:DeleteItem"
+      Resource:
+        - !GetAtt EmployeeTable.Arn
 custom:
   employeeTableName: employee-Details-${self:provider.stage}
 plugins:
   - serverless-iam-roles-per-function
-  - serverless-offline  # Add this line to include the serverless-offline plugin
-package:
-  individually: true
 functions:
-  employeeGetAll:
-    handler: src/Lamda/employee/employeeHandler.getAllEmployees
-    name: employeeGetAll
-    memorySize: 512
+  employeeGet:
+    handler: src/Lamda/employee/employeeHandler.getEmployee
+    name: getEmployeeDetails
+    memorySize: 128
+    timeout: 120
+    events:
+      - http:
+          path: employee/{employeeId}
+          method: GET
+  employeeCreate:
+    handler: src/Lamda/employee/employeeHandler.createEmployee
+    name: employeeCreate
+    memorySize: 128
     timeout: 120
     events:
       - http:
           path: employee
+          method: POST
+  employeeGetAll:
+    handler: src/Lamda/employee/employeeHandler.getAllEmployees
+    name: employeeGetAll
+    memorySize: 128
+    timeout: 120
+    events:
+      - http:
+          path: employees
           method: GET
-    iamRoleStatements:
-      - Effect: "Allow"
-        Action:
-          - "dynamodb:PutItem"
-          - "dynamodb:UpdateItem"
-          - "dynamodb:GetItem"
-          - "dynamodb:Scan"
-          - "dynamodb:DeleteItem"
-        Resource:
-          - !GetAtt EmployeeTable.Arn
-
 resources:
   Resources:
     EmployeeTable:
@@ -41,11 +55,12 @@ resources:
       Properties:
         TableName: ${self:custom.employeeTableName}
         AttributeDefinitions:
-          - AttributeName: empId
+          - AttributeName: employeeId
             AttributeType: S
         KeySchema:
-          - AttributeName: empId
+          - AttributeName: employeeId
             KeyType: HASH
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
+        
