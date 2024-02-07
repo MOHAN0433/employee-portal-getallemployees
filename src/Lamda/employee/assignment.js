@@ -20,6 +20,7 @@ const {
     console.log("Create employee details");
     const response = { statusCode: httpStatusCodes.SUCCESS };
     try {
+        
       const requestBody = JSON.parse(event.body);
   
       // Check for required fields
