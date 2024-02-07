@@ -15,6 +15,7 @@ provider:
         - "dynamodb:GetItem"
         - "dynamodb:Scan"
         - "dynamodb:DeleteItem"
+        - "dynamodb:CreateTable" 
       Resource:
         - !GetAtt EmployeeTable.Arn
 
