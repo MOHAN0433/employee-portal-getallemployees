@@ -19,8 +19,8 @@ provider:
         - !GetAtt EmployeeTable.Arn
 
 custom:
-  employeeTableName: employee-Details-${self:provider.stage}
-  assignmentsTableName: assignments-${self:provider.stage}
+  employeeTableName: mohan-employee-Details
+  assignmentsTableName: assignments
 
 plugins:
   - serverless-iam-roles-per-function
