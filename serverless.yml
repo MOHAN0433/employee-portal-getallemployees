@@ -16,10 +16,15 @@ provider:
         - "dynamodb:DeleteItem"
       Resource:
         - !GetAtt EmployeeTable.Arn
+    # Add IAM permissions for the assignments table if needed
+
 custom:
   employeeTableName: employee-Details-${self:provider.stage}
+  assignmentsTableName: assignments-${self:provider.stage}
+
 plugins:
   - serverless-iam-roles-per-function
+
 functions:
   employeeGet:
     handler: src/Lamda/employee/employeeHandler.getEmployee
@@ -48,6 +53,7 @@ functions:
       - http:
           path: employees
           method: GET
+
 resources:
   Resources:
     EmployeeTable:
@@ -63,4 +69,23 @@ resources:
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
-        
+
+    AssignmentsTable: # Define the assignments table
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:custom.assignmentsTableName}
+        AttributeDefinitions:
+          - AttributeName: assignmentId
+            AttributeType: S
+          - AttributeName: employeeId
+            AttributeType: S
+          # Define other attribute definitions as needed
+        KeySchema:
+          - AttributeName: assignmentId
+            KeyType: HASH
+          - AttributeName: employeeId
+            KeyType: RANGE # Indicates this is a sort key
+          # Define additional key schema attributes as needed
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1

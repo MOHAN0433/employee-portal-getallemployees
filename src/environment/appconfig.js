@@ -14,6 +14,8 @@ const httpStatusCodes = {
     SUCCESSFULLY_RETRIEVED_EMPLOYEE_DETAILS: "Successfully retrieved Employee details.",
     EMPLOYEE_DETAILS_NOT_FOUND: "Employee details not found.",
     EMPLOYEE_ID_REQUIRED: "Employee Id is required",
+    SUCCESSFULLY_CREATED_ASSIGNMENT_DETAILS : "Successfully created Assignment details.",
+    FAILED_TO_CREATE_ASSIGNMENT_DETAILS : "Failed to create Assignment details."
   };
   
   module.exports = {
