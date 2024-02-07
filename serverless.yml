@@ -56,6 +56,16 @@ functions:
           path: employees
           method: GET
 
+  createAssignment:
+    handler: src/Lamda/employee/assignments.createAssignment
+    name: createAssignment
+    memorySize: 128
+    timeout: 120
+    events:
+      - http:
+          path: assignments
+          method: POST
+
 resources:
   Resources:
     EmployeeTable:
