@@ -57,7 +57,7 @@ functions:
           method: GET
 
   createAssignment:
-    handler: src/Lamda/employee/assignments.createAssignment
+    handler: src/Lamda/employee/assignment.createAssignment
     name: createAssignment
     memorySize: 128
     timeout: 120
