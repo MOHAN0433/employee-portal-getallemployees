@@ -7,6 +7,7 @@ provider:
   region: us-east-1
   environment:
     EMPLOYEE_TABLE: ${self:custom.employeeTableName}
+    ASSIGNMENTS_TABLE : ${self:custom.assignmentsTableName}
   iamRoleStatements:
     - Effect: "Allow"
       Action:
@@ -17,6 +18,7 @@ provider:
         - "dynamodb:DeleteItem"
       Resource:
         - !GetAtt EmployeeTable.Arn
+        - !GetAtt assignmentsTable.Arn
 
 custom:
   employeeTableName: mohan-employee-Details
