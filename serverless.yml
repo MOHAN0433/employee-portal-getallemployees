@@ -1,12 +1,12 @@
 service: employee-portal-service
-
 provider:
   name: aws
-  runtime: nodejs14.x
+  runtime: nodejs18.x
   stage: dev
   region: us-east-1
   environment:
     EMPLOYEE_TABLE: ${self:custom.employeeTableName}
+    ASSIGNMENTS_TABLE: ${self:custom.assignmentTableName}
   iamRoleStatements:
     - Effect: "Allow"
       Action:
@@ -17,15 +17,12 @@ provider:
         - "dynamodb:DeleteItem"
       Resource:
         - !GetAtt EmployeeTable.Arn
-        - !GetAtt AssignmentsTable.Arn
-
+        - !GetAtt AssignmentTable.Arn
 custom:
-  employeeTableName: mohan-employee-Details
-  assignmentsTableName: assignments
-
+  employeeTableName: employee-Details-${self:provider.stage}
+  assignmentTableName: assignment-Details-${self:provider.stage}
 plugins:
   - serverless-iam-roles-per-function
-
 functions:
   employeeGet:
     handler: src/Lamda/employee/employeeHandler.getEmployee
@@ -36,7 +33,6 @@ functions:
       - http:
           path: employee/{employeeId}
           method: GET
-
   employeeCreate:
     handler: src/Lamda/employee/employeeHandler.createEmployee
     name: employeeCreate
@@ -46,7 +42,6 @@ functions:
       - http:
           path: employee
           method: POST
-
   employeeGetAll:
     handler: src/Lamda/employee/employeeHandler.getAllEmployees
     name: employeeGetAll
@@ -56,17 +51,15 @@ functions:
       - http:
           path: employees
           method: GET
-
-  createAssignment:
-    handler: src/Lamda/employee/assignment.createAssignment
-    name: createAssignment
+  assignmentCreate:
+    handler: src/Lamda/assignment/assignmentHandler.createAssignment
+    name: assignmentCreate
     memorySize: 128
     timeout: 120
     events:
       - http:
-          path: assignments
+          path: assignment
           method: POST
-
 resources:
   Resources:
     EmployeeTable:
@@ -82,32 +75,20 @@ resources:
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
-
-    AssignmentsTable:
+    AssignmentTable:
       Type: AWS::DynamoDB::Table
       Properties:
-        TableName: ${self:custom.assignmentsTableName}
+        TableName: ${self:custom.assignmentTableName}
         AttributeDefinitions:
           - AttributeName: assignmentId
             AttributeType: S
           - AttributeName: employeeId
             AttributeType: S
         KeySchema:
-          - AttributeName: assignmentId
-            KeyType: HASH
           - AttributeName: employeeId
+            KeyType: HASH
+          - AttributeName: assignmentId
             KeyType: RANGE
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
-      DependsOn: EmployeeTable # Ensure EmployeeTable is created before AssignmentsTable
-
-  Outputs:
-    EmployeeTableArn:
-      Value: !GetAtt EmployeeTable.Arn
-    AssignmentsTableArn:
-      Value: !GetAtt AssignmentsTable.Arn
-    EmployeeTableName:
-      Value: ${self:custom.employeeTableName}
-    AssignmentsTableName:
-      Value: ${self:custom.assignmentsTableName}
