@@ -1,11 +1,14 @@
 const { DynamoDBClient, PutItemCommand } = require("@aws-sdk/client-dynamodb");
 const { marshall } = require("@aws-sdk/util-dynamodb");
 const moment = require("moment");
-const client = new DynamoDBClient();
 const {
   httpStatusCodes,
   httpStatusMessages,
 } = require("../../environment/appconfig");
+
+// Initialize DynamoDB client with the correct region
+const client = new DynamoDBClient({ region: "us-east-1" });
+
 const currentDate = Date.now(); // get the current date and time in milliseconds
 const formattedDate = moment(currentDate).format("YYYY-MM-DD HH:mm:ss"); // formatting date
 
