@@ -41,6 +41,7 @@ const createAssignment = async (event) => {
         createdDateTime: formattedDate,
       }),
     };
+    
     const createResult = await client.send(new PutItemCommand(params));
     response.body = JSON.stringify({
       message: httpStatusMessages.SUCCESSFULLY_CREATED_ASSIGNMENT_DETAILS,
