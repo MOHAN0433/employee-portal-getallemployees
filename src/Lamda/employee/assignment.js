@@ -60,5 +60,5 @@ const createAssignment = async (event) => {
 };
 
 module.exports = {
-  createAssignment,
+  createAssignment
 };
