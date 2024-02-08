@@ -1,47 +1,4 @@
-resources:
-  Resources:
-    EmployeeTable:
-      Type: AWS::DynamoDB::Table
-      Properties:
-        TableName: ${self:custom.employeeTableName}
-        AttributeDefinitions:
-          - AttributeName: employeeId
-            AttributeType: S
-        KeySchema:
-          - AttributeName: employeeId
-            KeyType: HASH
-        ProvisionedThroughput:
-          ReadCapacityUnits: 1
-          WriteCapacityUnits: 1
-
-    AssignmentsTable:
-      Type: AWS::DynamoDB::Table
-      Properties:
-        TableName: ${self:custom.assignmentsTableName}
-        AttributeDefinitions:
-          - AttributeName: assignmentId
-            AttributeType: S
-          - AttributeName: employeeId
-            AttributeType: S
-        KeySchema:
-          - AttributeName: assignmentId
-            KeyType: HASH
-          - AttributeName: employeeId
-            KeyType: RANGE
-        ProvisionedThroughput:
-          ReadCapacityUnits: 1
-          WriteCapacityUnits: 1
-      DependsOn: EmployeeTable # Ensure EmployeeTable is created before AssignmentsTable
-
-  Outputs:
-    EmployeeTableArn:
-      Value: !GetAtt EmployeeTable.Arn
-    AssignmentsTableArn:
-      Value: !GetAtt AssignmentsTable.Arn
-    EmployeeTableName:
-      Value: ${self:custom.employeeTableName}
-    AssignmentsTableName:
-      Value: ${self:custom.assignmentsTableName}
+service: employee-portal-service
 
 provider:
   name: aws
@@ -109,3 +66,48 @@ functions:
       - http:
           path: assignments
           method: POST
+
+resources:
+  Resources:
+    EmployeeTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:custom.employeeTableName}
+        AttributeDefinitions:
+          - AttributeName: employeeId
+            AttributeType: S
+        KeySchema:
+          - AttributeName: employeeId
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+
+    AssignmentsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:custom.assignmentsTableName}
+        AttributeDefinitions:
+          - AttributeName: assignmentId
+            AttributeType: S
+          - AttributeName: employeeId
+            AttributeType: S
+        KeySchema:
+          - AttributeName: assignmentId
+            KeyType: HASH
+          - AttributeName: employeeId
+            KeyType: RANGE
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+      DependsOn: EmployeeTable # Ensure EmployeeTable is created before AssignmentsTable
+
+  Outputs:
+    EmployeeTableArn:
+      Value: !GetAtt EmployeeTable.Arn
+    AssignmentsTableArn:
+      Value: !GetAtt AssignmentsTable.Arn
+    EmployeeTableName:
+      Value: ${self:custom.employeeTableName}
+    AssignmentsTableName:
+      Value: ${self:custom.assignmentsTableName}
