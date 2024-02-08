@@ -33,20 +33,20 @@ const createAssignment = async (event) => {
       throw new Error("Required fields are missing.");
     }
 
-    // const getItemParams = {
-    //     TableName: process.env.ASSIGNMENTS_TABLE,
-    //     Key: marshall({
-    //       employeeId: requestBody.employeeId,
-    //       assignmentId: requestBody.assignmentId
-    //     })
-    //   };
-
-      const getItemParams = {
+    const getItemParams = {
         TableName: process.env.ASSIGNMENTS_TABLE,
-        Key: {
-          employeeId: { S: requestBody.employeeId }
-        }
+        Key: marshall({
+          employeeId: requestBody.employeeId,
+          assignmentId: requestBody.assignmentId
+        })
       };
+
+    //   const getItemParams = {
+    //     TableName: process.env.ASSIGNMENTS_TABLE,
+    //     Key: {
+    //       employeeId: { S: requestBody.employeeId }
+    //     }
+    //   };
 
     const existingAssignment = await client.send(new GetItemCommand(getItemParams));
     if (existingAssignment.Item) {
