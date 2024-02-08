@@ -59,8 +59,9 @@ const createAssignment = async (event) => {
         assignmentId: requestBody.assignmentId,
         employeeId: requestBody.employeeId,
         department: requestBody.department,
-        designation: Array.isArray(requestBody.designation) ? requestBody.designation : [requestBody.designation],
-        coreTechnology: requestBody.coreTechnology || null,
+        designation: Array.isArray(requestBody.designation) 
+        ? requestBody.designation.map(designation => ({ [designation]: true })) // Convert array of strings to array of objects
+        : [{ [requestBody.designation]: true }], // Convert string to array of object        coreTechnology: requestBody.coreTechnology || null,
         framework: requestBody.framework || null,
         reportingManager: typeof requestBody.reportingManager === 'string' ? requestBody.reportingManager : null,
         onsite: requestBody.onsite || null,
