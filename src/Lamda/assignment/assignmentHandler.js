@@ -53,16 +53,21 @@ const createAssignment = async (event) => {
       throw new Error("Assignment already exists for this employee.");
     }
 
+    const designationArray = Array.isArray(requestBody.designation)
+      ? requestBody.designation.map(desig => ({ designation: desig })) // Convert array of strings to array of objects
+      : [{ designation: requestBody.designation }];
+
     const params = {
       TableName: process.env.ASSIGNMENTS_TABLE, // Use ASSIGNMENTS_TABLE environment variable
       Item: marshall({
         assignmentId: requestBody.assignmentId,
         employeeId: requestBody.employeeId,
         department: requestBody.department,
-        designation: Array.isArray(requestBody.designation) 
-        ? requestBody.designation.map(designation => ({ [designation]: true })) // Convert array of strings to array of objects
-        : [{ [requestBody.designation]: true }], // Convert string to array of object        coreTechnology: requestBody.coreTechnology || null,
-        framework: requestBody.framework || null,
+        designation: designationArray,
+        // designation: Array.isArray(requestBody.designation) 
+        // ? requestBody.designation.map(designation => ({ [designation]: true })) // Convert array of strings to array of objects
+        // : [{ [requestBody.designation]: true }], // Convert string to array of object        coreTechnology: requestBody.coreTechnology || null,
+        // framework: requestBody.framework || null,
         reportingManager: typeof requestBody.reportingManager === 'string' ? requestBody.reportingManager : null,
         onsite: requestBody.onsite || null,
         billableResource: requestBody.billableResource || null,
