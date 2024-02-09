@@ -63,12 +63,26 @@ const createAssignment = async (event) => {
       throw new Error("An assignment already exists for this employee.");
     }
 
+    if(requestBody.branchOffice === null || !["San Antonio(USA)", "Bangalore(INDIA)"].includes(requestBody.branchOffice)){
+      throw new Error("Incorrect BranchOffice");
+    }
+
     if(requestBody.onsite === null || !["Yes", "No"].includes(requestBody.onsite)){
       throw new Error("Onsite should be either 'Yes' or 'No'.");
     }
 
     if(requestBody.billableResource === null || !["Yes", "No"].includes(requestBody.billableResource)){
-      throw new Error("billableResource should be either 'Yes' or 'No'.");
+      throw new Error("billableResource should be either 'Yes' or 'No'!");
+    }
+
+    if(requestBody.designation === null || !["Software Engineer Trainee", "Software Engineer", "Senior software Engineer", "Testing Engineer Trainee",
+                                            "Testing Engineer", "Senior Testing Engineer", "Tech Lead", "Testing Lead", "Manager", "Project Manager", "Senior Manager",
+                                            "Analyst", "Senior Analyst", "Architect", "Senior Architect", "Solution Architect", "Scrum Master", "Data Engineer"].includes(requestBody.designation)){
+      throw new Error("Incorrect Designation!");
+    }
+
+    if(requestBody.department === null || !["IT", "Non- IT", "Sales"].includes(requestBody.department)){
+      throw new Error("Incorrect Department!");
     }
 
     const getEmployeeParams = {
@@ -82,6 +96,10 @@ const createAssignment = async (event) => {
     if (!existingEmployee.Item) {
       throw new Error("Employee not found in the employee-Details-dev table.");
     }
+
+    // Fetch the highest highestSerialNumber from the DynamoDB table
+    const highestSerialNumber = await getHighestSerialNumber();
+    const nextSerialNumber = highestSerialNumber !== undefined ? highestSerialNumber + 1 : 1;
   
 
     const params = {
@@ -105,12 +123,37 @@ const createAssignment = async (event) => {
         createdDateTime: formattedDate,
       }),
     };
+  
     
     const createResult = await client.send(new PutItemCommand(params));
     response.body = JSON.stringify({
       message: httpStatusMessages.SUCCESSFULLY_CREATED_ASSIGNMENT_DETAILS,
       createResult,
     });
+
+    async function getHighestSerialNumber() {
+      const params = {
+        TableName: process.env.ASSIGNMENTS_TABLE,
+        ProjectionExpression: 'assignmentId',
+        Limit: 1,
+        ScanIndexForward: false, // Sort in descending order to get the highest serial number first
+      };
+    
+      try {
+        const result = await client.send(new ScanCommand(params));
+        if (result.Items.length === 0) {
+          return undefined; // If no records found, return undefined
+        } else {
+          // Parse and return the highest serial number without incrementing
+          return parseInt(result.Items[0].assignmentId.N);
+        }
+      } catch (error) {
+        console.error("Error retrieving highest serial number:", error);
+        throw error; // Propagate the error up the call stack
+      }
+    }
+    
+    
   } catch (e) {
     console.error(e);
     response.statusCode = httpStatusCodes.BAD_REQUEST;
