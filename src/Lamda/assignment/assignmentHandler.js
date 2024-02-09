@@ -49,11 +49,11 @@ const createAssignment = async (event) => {
     }
 
     if(requestBody.onsite === null || !["Yes", "No"].includes(requestBody.onsite)){
-      throw new error("Onsite should be either 'Yes' or 'No'.");
+      throw new Error("Onsite should be either 'Yes' or 'No'.");
     }
 
     if(requestBody.billableResource === null || !["Yes", "No"].includes(requestBody.billableResource)){
-      throw new error("billableResource should be either 'Yes' or 'No'.");
+      throw new Error("billableResource should be either 'Yes' or 'No'.");
     }
   
 
