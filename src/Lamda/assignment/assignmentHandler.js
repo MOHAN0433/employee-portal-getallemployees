@@ -99,7 +99,7 @@ const createAssignment = async (event) => {
 
     // Fetch the highest highestSerialNumber from the DynamoDB table
     const highestSerialNumber = await getHighestSerialNumber();
-    const nextSerialNumber = highestSerialNumber !== undefined ? highestSerialNumber + 1 : 1;
+    const nextSerialNumber = highestSerialNumber == undefined ? highestSerialNumber + 1 : 1;
   
 
     const params = {
