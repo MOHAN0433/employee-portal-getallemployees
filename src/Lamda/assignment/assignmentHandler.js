@@ -72,8 +72,8 @@ const createAssignment = async (event) => {
         // framework: requestBody.framework || null,
         //reportingManager: typeof requestBody.reportingManager === 'string' ? requestBody.reportingManager : throw new error,
         reportingManager : requestBody.requestBody,
-        onsite: requestBody.onsite || false,
-        billableResource: requestBody.billableResource || false,
+        onsite: requestBody.onsite || "No",
+        billableResource: requestBody.billableResource || "No",
         createdDateTime: formattedDate,
       }),
     };
