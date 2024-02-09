@@ -48,11 +48,11 @@ const createAssignment = async (event) => {
       throw new Error("Assignment already exists for this employee.");
     }
 
-    if(requestBody.onsite === null || ["Yes", "No"].includes(requestBody.onsite)){
+    if(requestBody.onsite === null || !["Yes", "No"].includes(requestBody.onsite)){
       throw new error("Onsite should be either 'Yes' or 'No'.");
     }
 
-    if(requestBody.billableResource === null || ["Yes", "No"].includes(requestBody.billableResource)){
+    if(requestBody.billableResource === null || !["Yes", "No"].includes(requestBody.billableResource)){
       throw new error("billableResource should be either 'Yes' or 'No'.");
     }
   
