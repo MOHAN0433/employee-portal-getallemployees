@@ -43,21 +43,19 @@ const createAssignment = async (event) => {
         })
       };
 
-    //   const getItemParams = {
-    //     TableName: process.env.ASSIGNMENTS_TABLE,
-    //     Key: {
-    //       employeeId: { S: requestBody.employeeId }
-    //     }
-    //   };
-
     const existingAssignment = await client.send(new GetItemCommand(getItemParams));
     if (existingAssignment.Item) {
       throw new Error("Assignment already exists for this employee.");
     }
 
-    const designationArray = Array.isArray(requestBody.designation)
-      ? requestBody.designation.map(desig => ({ designation: desig })) // Convert array of strings to array of objects
-      : [{ designation: requestBody.designation }];
+    if(onsite === null || ["Yes", "No"].includes(requestBody.onsite)){
+      throw new error("Onsite should be either 'Yes' or 'No'.");
+    }
+
+    if(billableResource === null || ["Yes", "No"].includes(requestBody.billableResource)){
+      throw new error("billableResource should be either 'Yes' or 'No'.");
+    }
+  
 
     const params = {
       TableName: process.env.ASSIGNMENTS_TABLE, // Use ASSIGNMENTS_TABLE environment variable
@@ -66,16 +64,14 @@ const createAssignment = async (event) => {
         employeeId: requestBody.employeeId,
         department: requestBody.department,
         branchOffice : requestBody.branchOffice,
-        designation: designationArray.map((desig, index) => ({
-            id: index + 1,
-            value: desig,
-          })),
+        designation: requestBody.designation,
         coreTechnology : requestBody.coreTechnology,
         // designation: Array.isArray(requestBody.designation) 
         // ? requestBody.designation.map(designation => ({ [designation]: true })) // Convert array of strings to array of objects
         // : [{ [requestBody.designation]: true }], // Convert string to array of object        coreTechnology: requestBody.coreTechnology || null,
         // framework: requestBody.framework || null,
-        reportingManager: typeof requestBody.reportingManager === 'string' ? requestBody.reportingManager : null,
+        //reportingManager: typeof requestBody.reportingManager === 'string' ? requestBody.reportingManager : throw new error,
+        reportingManager : requestBody.requestBody,
         onsite: requestBody.onsite || false,
         billableResource: requestBody.billableResource || false,
         createdDateTime: formattedDate,
