@@ -25,9 +25,11 @@ const createAssignment = async (event) => {
     // Check for required fields
     const requiredFields = [
       "employeeId",
-      "assignmentId",
       "department",
       "designation",
+      "branchOffice",
+      "coreTechnology",
+      "billableResource"
     ];
     if (!requiredFields.every((field) => requestBody[field])) {
       throw new Error("Required fields are missing.");
@@ -63,14 +65,19 @@ const createAssignment = async (event) => {
         assignmentId: requestBody.assignmentId,
         employeeId: requestBody.employeeId,
         department: requestBody.department,
-        designation: designationArray,
+        branchOffice : requestBody.branchOffice,
+        designation: designationArray.map((desig, index) => ({
+            id: index + 1,
+            value: desig,
+          })),
+        coreTechnology : requestBody.coreTechnology,
         // designation: Array.isArray(requestBody.designation) 
         // ? requestBody.designation.map(designation => ({ [designation]: true })) // Convert array of strings to array of objects
         // : [{ [requestBody.designation]: true }], // Convert string to array of object        coreTechnology: requestBody.coreTechnology || null,
         // framework: requestBody.framework || null,
         reportingManager: typeof requestBody.reportingManager === 'string' ? requestBody.reportingManager : null,
-        onsite: requestBody.onsite || null,
-        billableResource: requestBody.billableResource || null,
+        onsite: requestBody.onsite || false,
+        billableResource: requestBody.billableResource || false,
         createdDateTime: formattedDate,
       }),
     };
