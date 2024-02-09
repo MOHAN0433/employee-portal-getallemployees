@@ -29,7 +29,8 @@ const createAssignment = async (event) => {
       "designation",
       "branchOffice",
       "coreTechnology",
-      "billableResource"
+      "billableResource",
+      "onsite"
     ];
     if (!requiredFields.every((field) => requestBody[field])) {
       throw new Error("Required fields are missing.");
@@ -46,6 +47,19 @@ const createAssignment = async (event) => {
     const existingAssignment = await client.send(new GetItemCommand(getItemParams));
     if (existingAssignment.Item) {
       throw new Error("Assignment already exists for this employee.");
+    }
+
+    const existingAssignmentParams = {
+      TableName: process.env.ASSIGNMENTS_TABLE,
+      KeyConditionExpression: "employeeId = :employeeId",
+      ExpressionAttributeValues: {
+        ":employeeId": { S: requestBody.employeeId }
+      }
+    };
+
+    const existingAssignments = await client.send(new QueryCommand(existingAssignmentParams));
+    if (existingAssignments.Items && existingAssignments.Items.length > 0) {
+      throw new Error("An assignment already exists for this employee.");
     }
 
     if(requestBody.onsite === null || !["Yes", "No"].includes(requestBody.onsite)){
