@@ -110,7 +110,6 @@ const createAssignment = async (event) => {
         department: requestBody.department,
         branchOffice : requestBody.branchOffice,
         framework : requestBody.framework,
-        department : requestBody.department,
         designation: requestBody.designation,
         coreTechnology : requestBody.coreTechnology,
         // designation: Array.isArray(requestBody.designation) 
