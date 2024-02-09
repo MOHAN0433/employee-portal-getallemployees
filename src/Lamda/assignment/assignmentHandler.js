@@ -101,6 +101,10 @@ const createAssignment = async (event) => {
     const highestSerialNumber = await getHighestSerialNumber();
     const nextSerialNumber = highestSerialNumber !== undefined ? highestSerialNumber + 1 : 1;
   
+    if (nextSerialNumber === undefined) {
+      throw new Error("Unable to determine next serial number for assignment.");
+  }
+
     async function getHighestSerialNumber() {
       const params = {
         TableName: process.env.ASSIGNMENTS_TABLE,
