@@ -64,6 +64,7 @@ const createAssignment = async (event) => {
         employeeId: requestBody.employeeId,
         department: requestBody.department,
         branchOffice : requestBody.branchOffice,
+        department : requestBody.department,
         designation: requestBody.designation,
         coreTechnology : requestBody.coreTechnology,
         // designation: Array.isArray(requestBody.designation) 
@@ -72,8 +73,8 @@ const createAssignment = async (event) => {
         // framework: requestBody.framework || null,
         //reportingManager: typeof requestBody.reportingManager === 'string' ? requestBody.reportingManager : throw new error,
         reportingManager : requestBody.requestBody,
-        onsite: requestBody.onsite || "No",
-        billableResource: requestBody.billableResource || "No",
+        onsite: requestBody.onsite,
+        billableResource: requestBody.billableResource,
         createdDateTime: formattedDate,
       }),
     };
