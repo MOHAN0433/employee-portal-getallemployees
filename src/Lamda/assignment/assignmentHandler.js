@@ -22,6 +22,8 @@ const createAssignment = async (event) => {
   const response = { statusCode: httpStatusCodes.SUCCESS };
   try {
     const requestBody = JSON.parse(event.body);
+    console.log("Request Body:", requestBody);
+
 
     // Check for required fields
     const requiredFields = [
@@ -127,6 +129,8 @@ const createAssignment = async (event) => {
         throw error; // Propagate the error up the call stack
       }
     }
+    console.log("Request Body:", requestBody);
+
 
     const params = {
       TableName: process.env.ASSIGNMENTS_TABLE, // Use ASSIGNMENTS_TABLE environment variable
