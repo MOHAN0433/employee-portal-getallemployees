@@ -101,9 +101,7 @@ const createAssignment = async (event) => {
 
     // Fetch the highest highestSerialNumber from the DynamoDB table
     const highestSerialNumber = await getHighestSerialNumber();
-    console.log("highestSerialNumber" + highestSerialNumber)
     const nextSerialNumber = highestSerialNumber !== undefined ? highestSerialNumber + 1 : 1;
-  console.log("nextSerialNumber" + nextSerialNumber)
     if (nextSerialNumber === undefined) {
       throw new Error("Unable to determine next serial number for assignment.");
   }
@@ -119,7 +117,7 @@ const createAssignment = async (event) => {
       try {
         const result = await client.send(new ScanCommand(params));
         if (result.Items.length === 0) {
-          return undefined; // If no records found, return undefined
+          return 0; // If no records found, return undefined
         } else {
           // Parse and return the highest serial number without incrementing
           return parseInt(result.Items[0].assignmentId); // If assignmentId is a string
