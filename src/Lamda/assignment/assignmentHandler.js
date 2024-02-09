@@ -70,6 +70,18 @@ const createAssignment = async (event) => {
     if(requestBody.billableResource === null || !["Yes", "No"].includes(requestBody.billableResource)){
       throw new Error("billableResource should be either 'Yes' or 'No'.");
     }
+
+    const getEmployeeParams = {
+      TableName: "employee-Details-dev",
+      Key: marshall({
+        employeeId: requestBody.employeeId
+      })
+    };
+
+    const existingEmployee = await client.send(new GetItemCommand(getEmployeeParams));
+    if (!existingEmployee.Item) {
+      throw new Error("Employee not found in the employee-Details-dev table.");
+    }
   
 
     const params = {
