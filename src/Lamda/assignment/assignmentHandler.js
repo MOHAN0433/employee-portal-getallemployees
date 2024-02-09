@@ -105,7 +105,7 @@ const createAssignment = async (event) => {
     const params = {
       TableName: process.env.ASSIGNMENTS_TABLE, // Use ASSIGNMENTS_TABLE environment variable
       Item: marshall({
-        assignmentId: nextSerialNumber,
+        assignmentId: requestBody.assignmentId,
         employeeId: requestBody.employeeId,
         department: requestBody.department,
         branchOffice : requestBody.branchOffice,
