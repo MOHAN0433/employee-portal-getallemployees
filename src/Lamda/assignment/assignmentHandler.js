@@ -101,6 +101,27 @@ const createAssignment = async (event) => {
     const highestSerialNumber = await getHighestSerialNumber();
     const nextSerialNumber = highestSerialNumber !== undefined ? highestSerialNumber + 1 : 1;
   
+    async function getHighestSerialNumber() {
+      const params = {
+        TableName: process.env.ASSIGNMENTS_TABLE,
+        ProjectionExpression: 'assignmentId',
+        Limit: 1,
+        ScanIndexForward: false, // Sort in descending order to get the highest serial number first
+      };
+    
+      try {
+        const result = await client.send(new ScanCommand(params));
+        if (result.Items.length === 0) {
+          return undefined; // If no records found, return undefined
+        } else {
+          // Parse and return the highest serial number without incrementing
+          return parseInt(result.Items[0].assignmentId); // If assignmentId is a string
+        }
+      } catch (error) {
+        console.error("Error retrieving highest serial number:", error);
+        throw error; // Propagate the error up the call stack
+      }
+    }
 
     const params = {
       TableName: process.env.ASSIGNMENTS_TABLE, // Use ASSIGNMENTS_TABLE environment variable
@@ -131,27 +152,7 @@ const createAssignment = async (event) => {
       createResult,
     });
 
-    async function getHighestSerialNumber() {
-      const params = {
-        TableName: process.env.ASSIGNMENTS_TABLE,
-        ProjectionExpression: 'assignmentId',
-        Limit: 1,
-        ScanIndexForward: false, // Sort in descending order to get the highest serial number first
-      };
     
-      try {
-        const result = await client.send(new ScanCommand(params));
-        if (result.Items.length === 0) {
-          return undefined; // If no records found, return undefined
-        } else {
-          // Parse and return the highest serial number without incrementing
-          return parseInt(result.Items[0].assignmentId.N);
-        }
-      } catch (error) {
-        console.error("Error retrieving highest serial number:", error);
-        throw error; // Propagate the error up the call stack
-      }
-    }
     
     
   } catch (e) {
