@@ -142,8 +142,8 @@ const getItemParams = {
 };
 
 const existingAssignment = await client.send(new GetItemCommand(getItemParams));
-if (existingAssignment.Item.employeeId) {
-throw new Error("Assignment already exists for this employee.");
+if (existingAssignment.Item && existingAssignment.Item.employeeId) {
+  throw new Error("Assignment already exists for this employee.");
 }
     const params = {
       TableName: process.env.ASSIGNMENTS_TABLE, // Use ASSIGNMENTS_TABLE environment variable
