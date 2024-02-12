@@ -136,14 +136,14 @@ async function getHighestSerialNumber() {
 const getItemParams = {
   TableName: process.env.ASSIGNMENTS_TABLE,
   Key: marshall({
-    assignmentId: { N: String(highestSerialNumber) }, // Convert to string for proper serialization
+    assignmentId: { N: String(highestSerialNumber) },
     employeeId: { S: requestBody.employeeId }
   })
 };
 console.log("getItemParams:", getItemParams);
 
 const existingAssignment = await client.send(new GetItemCommand(getItemParams));
-//console.log("Existing Assignment:", existingAssignment);
+console.log("Existing Assignment:", existingAssignment);
 if (existingAssignment.Item && existingAssignment.Item.employeeId.S === requestBody.employeeId) {
   throw new Error("Assignment already exists for this employee.");
 }
