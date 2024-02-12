@@ -141,9 +141,10 @@ const existingAssignment = await getAssignmentByEmployeeId(requestBody.employeeI
     async function getAssignmentByEmployeeId(employeeId) {
       const params = {
         TableName: process.env.ASSIGNMENTS_TABLE,
-        Key: marshall({
-          employeeId: employeeId
-        }),
+        Key: {
+          // Provide the correct key structure that matches your table's primary key schema
+          employeeId: { S: employeeId } // Assuming employeeId is a string (S)
+        },
       };
     
       try {
@@ -157,6 +158,7 @@ const existingAssignment = await getAssignmentByEmployeeId(requestBody.employeeI
         throw error;
       }
     }
+    
 
     const params = {
       TableName: process.env.ASSIGNMENTS_TABLE, // Use ASSIGNMENTS_TABLE environment variable
