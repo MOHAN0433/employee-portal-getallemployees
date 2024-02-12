@@ -133,22 +133,22 @@ async function getHighestSerialNumber() {
   }
 }
 
-    // const getItemParams = async (employeeId) => {
-    //   const params = {
-    //     TableName: process.env.ASSIGNMENTS_TABLE,
-    //     FilterExpression: "employeeId = :employeeIdValue",
-    //     ExpressionAttributeValues: {
-    //       ":employeeIdValue": { S: employeeId },
-    //     },
-    //     ProjectionExpression: "employeeId",
-    //   };
-    //   const command = new ScanCommand(params);
-    //   const data = await client.send(command);
-    //   return data.Items.length > 0;
-    // };
-    // if (getItemParams.Item) {
-    //   throw new Error("Assignment already exists for this employee.");
-    // }
+    const getItemParams = async (employeeId) => {
+      const params = {
+        TableName: process.env.ASSIGNMENTS_TABLE,
+        FilterExpression: "employeeId = :employeeIdValue",
+        ExpressionAttributeValues: {
+          ":employeeIdValue": { S: employeeId },
+        },
+        ProjectionExpression: "employeeId",
+      };
+      const command = new ScanCommand(params);
+      const data = await client.send(command);
+      return data.Items.length > 0;
+    };
+    if (getItemParams.Item) {
+      throw new Error("Assignment already exists for this employee.");
+    }
     //   const getItemParams = {
     //     TableName: process.env.ASSIGNMENTS_TABLE,
     //     Key: marshall({
@@ -161,19 +161,19 @@ async function getHighestSerialNumber() {
     //   throw new Error("Assignment already exists for this employee.");
     // }
 
-    // const existingAssignmentParams = {
-    //   TableName: process.env.ASSIGNMENTS_TABLE,
-    //   KeyConditionExpression: "assignmentId = :assignmentIdValue",
-    //   ExpressionAttributeValues: {
-    //     ":assignmentIdValue": { N: nextSerialNumber },
-    //   },
-    // };
-    // const existingAssignments = await client.send(
-    //   new QueryCommand(existingAssignmentParams)
-    // );
-    // if (existingAssignments.Items && existingAssignments.Items.length > 0) {
-    //   throw new Error("An assignment already exists for this employee.");
-    // }
+    const existingAssignmentParams = {
+      TableName: process.env.ASSIGNMENTS_TABLE,
+      KeyConditionExpression: "assignmentId = :assignmentIdValue",
+      ExpressionAttributeValues: {
+        ":assignmentIdValue": { N: nextSerialNumber },
+      },
+    };
+    const existingAssignments = await client.send(
+      new QueryCommand(existingAssignmentParams)
+    );
+    if (existingAssignments.Items && existingAssignments.Items.length > 0) {
+      throw new Error("An assignment already exists for this employee.");
+    }
     const params = {
       TableName: process.env.ASSIGNMENTS_TABLE, // Use ASSIGNMENTS_TABLE environment variable
       Item: marshall({
