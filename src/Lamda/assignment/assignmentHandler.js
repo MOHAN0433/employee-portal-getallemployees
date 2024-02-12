@@ -109,7 +109,7 @@ async function getHighestSerialNumber() {
     TableName: process.env.ASSIGNMENTS_TABLE,
     KeyConditionExpression: "assignmentId = :assignmentId",
     ExpressionAttributeValues: {
-      ":assignmentId": { S: requestBody.assignmentId }
+      ":assignmentId": { S: nextSerialNumber }
     }
   };
 
