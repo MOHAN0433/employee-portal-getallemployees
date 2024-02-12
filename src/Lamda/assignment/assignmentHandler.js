@@ -138,7 +138,7 @@ const createAssignment = async (event) => {
       const data = await client.send(command);
       return data.Items.length > 0;
     };
-    if (getItemParams) {
+    if (getItemParams.Item) {
       throw new Error("Assignment already exists for this employee.");
     }
     //   const getItemParams = {
