@@ -165,7 +165,7 @@ async function getHighestSerialNumber() {
       TableName: process.env.ASSIGNMENTS_TABLE,
       KeyConditionExpression: "assignmentId = :assignmentIdValue",
       ExpressionAttributeValues: {
-        ":assignmentIdValue": { N: nextSerialNumber },
+        ":assignmentIdValue": nextSerialNumber,
       },
     };
     const existingAssignments = await client.send(
