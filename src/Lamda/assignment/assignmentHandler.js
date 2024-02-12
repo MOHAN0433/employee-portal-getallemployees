@@ -133,22 +133,22 @@ async function getHighestSerialNumber() {
   }
 }
 
-    const getItemParams = async (employeeId) => {
-      const params = {
-        TableName: process.env.ASSIGNMENTS_TABLE,
-        FilterExpression: "employeeId = :employeeIdValue",
-        ExpressionAttributeValues: {
-          ":employeeIdValue": { S: employeeId },
-        },
-        ProjectionExpression: "employeeId",
-      };
-      const command = new ScanCommand(params);
-      const data = await client.send(command);
-      return data.Items.length > 0;
-    };
-    if (getItemParams.Item) {
-      throw new Error("Assignment already exists for this employee.");
-    }
+    // const getItemParams = async (employeeId) => {
+    //   const params = {
+    //     TableName: process.env.ASSIGNMENTS_TABLE,
+    //     FilterExpression: "employeeId = :employeeIdValue",
+    //     ExpressionAttributeValues: {
+    //       ":employeeIdValue": { S: employeeId },
+    //     },
+    //     ProjectionExpression: "employeeId",
+    //   };
+    //   const command = new ScanCommand(params);
+    //   const data = await client.send(command);
+    //   return data.Items.length > 0;
+    // };
+    // if (getItemParams.Item) {
+    //   throw new Error("Assignment already exists for this employee.");
+    // }
     //   const getItemParams = {
     //     TableName: process.env.ASSIGNMENTS_TABLE,
     //     Key: {
@@ -183,6 +183,29 @@ async function getHighestSerialNumber() {
     //   throw error; // Propagate the error up the call stack
     // }
     
+    const employeeExists = await checkEmployeeExists(requestBody.employeeId);
+    if (employeeExists) {
+      throw new Error("Assignment already exists for this employee.");
+    }
+
+    async function checkEmployeeExists(employeeId) {
+      const params = {
+        TableName: process.env.ASSIGNMENTS_TABLE,
+        KeyConditionExpression: "employeeId = :employeeIdValue",
+        ExpressionAttributeValues: {
+          ":employeeIdValue": { S: employeeId },
+        },
+        ProjectionExpression: "employeeId",
+      };
+      try {
+        const { Count } = await client.send(new QueryCommand(params));
+        return Count > 0;
+      } catch (error) {
+        console.error("Error checking if employee exists:", error);
+        throw error;
+      }
+    }
+
     const params = {
       TableName: process.env.ASSIGNMENTS_TABLE, // Use ASSIGNMENTS_TABLE environment variable
       Item: marshall({
