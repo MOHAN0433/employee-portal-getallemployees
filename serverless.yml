@@ -81,14 +81,14 @@ resources:
       Properties:
         TableName: ${self:custom.assignmentTableName}
         AttributeDefinitions:
-          - AttributeName: assignmentId
-            AttributeType: S
           - AttributeName: employeeId
+            AttributeType: S
+          - AttributeName: assignmentId
             AttributeType: S
         KeySchema:
-          - AttributeName: employeeId
-            KeyType: HASH
           - AttributeName: assignmentId
+            KeyType: HASH
+          - AttributeName: employeeId
             KeyType: RANGE
         ProvisionedThroughput:
           ReadCapacityUnits: 1

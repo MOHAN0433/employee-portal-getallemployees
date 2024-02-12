@@ -74,18 +74,6 @@ const createAssignment = async (event) => {
       throw new Error("Incorrect Department!");
     }
 
-    // const getEmployeeParams = {
-    //   TableName: "employee-Details-dev",
-    //   Key: marshall({
-    //     employeeId: requestBody.employeeId
-    //   })
-    // };
-
-    // const existingEmployee = await client.send(new GetItemCommand(getEmployeeParams));
-    // if (!existingEmployee.Item) {
-    //   throw new Error("Employee not found in the employee-Details-dev table.");
-    // }
-
     const highestSerialNumber = await getHighestSerialNumber();
 const nextSerialNumber = highestSerialNumber !== "NaN" ? (parseInt(highestSerialNumber) + 1).toString() : "1";
 
