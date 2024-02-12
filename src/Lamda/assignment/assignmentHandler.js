@@ -89,17 +89,13 @@ async function getHighestSerialNumber() {
     throw error; // Propagate the error up the call stack
   }
 }
-
-    console.log("Request Body:", requestBody);
-
     const getItemParams = {
       TableName: process.env.ASSIGNMENTS_TABLE,
       Key: marshall({
         employeeId: requestBody.employeeId,
-        assignmentId: highestSerialNumber
+       // assignmentId: highestSerialNumber
       })
     };
-
   const existingAssignment = await client.send(new GetItemCommand(getItemParams));
   if (existingAssignment.Item) {
     throw new Error("Assignment already exists for this employee.");
@@ -107,12 +103,11 @@ async function getHighestSerialNumber() {
 
   const existingAssignmentParams = {
     TableName: process.env.ASSIGNMENTS_TABLE,
-    KeyConditionExpression: "assignmentId = :assignmentId",
+    KeyConditionExpression: "assignmentId = :assignmentIdValue",
     ExpressionAttributeValues: {
-      ":assignmentId": { S: highestSerialNumber }
+      ":assignmentIdValue": { S: nextSerialNumber }
     }
   };
-
   const existingAssignments = await client.send(new QueryCommand(existingAssignmentParams));
   if (existingAssignments.Items && existingAssignments.Items.length > 0) {
     throw new Error("An assignment already exists for this employee.");
@@ -139,15 +134,11 @@ async function getHighestSerialNumber() {
       }),
     };
   
-    
     const createResult = await client.send(new PutItemCommand(params));
     response.body = JSON.stringify({
       message: httpStatusMessages.SUCCESSFULLY_CREATED_ASSIGNMENT_DETAILS,
       createResult,
     });
-
-    
-    
     
   } catch (e) {
     console.error(e);
