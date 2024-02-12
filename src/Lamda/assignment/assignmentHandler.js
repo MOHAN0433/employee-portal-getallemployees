@@ -136,8 +136,8 @@ async function getHighestSerialNumber() {
 const getItemParams = {
   TableName: process.env.ASSIGNMENTS_TABLE,
   Key: marshall({
-    assignmentId: highestSerialNumber,
-    employeeId: requestBody.employeeId
+    assignmentId: { N: String(highestSerialNumber) }, // Convert to string for proper serialization
+    employeeId: { S: requestBody.employeeId }
   })
 };
 
