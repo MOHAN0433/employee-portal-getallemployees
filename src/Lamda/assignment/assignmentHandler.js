@@ -101,32 +101,33 @@ const createAssignment = async (event) => {
 
     // Fetch the highest highestSerialNumber from the DynamoDB table
     const highestSerialNumber = await getHighestSerialNumber();
-    const nextSerialNumber = highestSerialNumber !== undefined ? highestSerialNumber + 1 : 1;
-    if (nextSerialNumber === undefined) {
-      throw new Error("Unable to determine next serial number for assignment.");
-  }
+const nextSerialNumber = highestSerialNumber !== undefined ? (parseInt(highestSerialNumber) + 1).toString() : "1";
 
-    async function getHighestSerialNumber() {
-      const params = {
-        TableName: process.env.ASSIGNMENTS_TABLE,
-        ProjectionExpression: 'assignmentId',
-        Limit: 1,
-        ScanIndexForward: false, // Sort in descending order to get the highest serial number first
-      };
-    
-      try {
-        const result = await client.send(new ScanCommand(params));
-        if (result.Items.length === 0) {
-          return 0; // If no records found, return undefined
-        } else {
-          // Parse and return the highest serial number without incrementing
-          return parseInt(result.Items[0].assignmentId); // If assignmentId is a string
-        }
-      } catch (error) {
-        console.error("Error retrieving highest serial number:", error);
-        throw error; // Propagate the error up the call stack
-      }
+if (!nextSerialNumber) {
+  throw new Error("Unable to determine next serial number for assignment.");
+}
+
+async function getHighestSerialNumber() {
+  const params = {
+    TableName: process.env.ASSIGNMENTS_TABLE,
+    ProjectionExpression: 'assignmentId',
+    Limit: 1,
+    ScanIndexForward: false, // Sort in descending order to get the highest serial number first
+  };
+
+  try {
+    const result = await client.send(new ScanCommand(params));
+    if (result.Items.length === 0) {
+      return "0"; // If no records found, return "0" as a string
+    } else {
+      // Parse and return the highest serial number without incrementing
+      return result.Items[0].assignmentId; // If assignmentId is a string
     }
+  } catch (error) {
+    console.error("Error retrieving highest serial number:", error);
+    throw error; // Propagate the error up the call stack
+  }
+}
     console.log("Request Body:", requestBody);
 
 
