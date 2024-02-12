@@ -105,7 +105,7 @@ async function getHighestSerialNumber() {
   try {
     const result = await client.send(new ScanCommand(params));
     if (result.Items.length === 0) {
-      return "0"; // If no records found, return "0" as a string
+      return 0; // If no records found, return "0" as a string
     } else {
       // Parse and return the highest serial number without incrementing
       return result.Items[0].assignmentId; // If assignmentId is a string
