@@ -154,19 +154,19 @@ async function getHighestSerialNumber() {
     //   throw new Error("Assignment already exists for this employee.");
     // }
 
-    const existingAssignmentParams = {
-      TableName: process.env.ASSIGNMENTS_TABLE,
-      KeyConditionExpression: "assignmentId = :assignmentIdValue",
-      ExpressionAttributeValues: {
-        ":assignmentIdValue": { N: nextSerialNumber },
-      },
-    };
-    const existingAssignments = await client.send(
-      new QueryCommand(existingAssignmentParams)
-    );
-    if (existingAssignments.Items && existingAssignments.Items.length > 0) {
-      throw new Error("An assignment already exists for this employee.");
-    }
+    // const existingAssignmentParams = {
+    //   TableName: process.env.ASSIGNMENTS_TABLE,
+    //   KeyConditionExpression: "assignmentId = :assignmentIdValue",
+    //   ExpressionAttributeValues: {
+    //     ":assignmentIdValue": { N: nextSerialNumber },
+    //   },
+    // };
+    // const existingAssignments = await client.send(
+    //   new QueryCommand(existingAssignmentParams)
+    // );
+    // if (existingAssignments.Items && existingAssignments.Items.length > 0) {
+    //   throw new Error("An assignment already exists for this employee.");
+    // }
     const params = {
       TableName: process.env.ASSIGNMENTS_TABLE, // Use ASSIGNMENTS_TABLE environment variable
       Item: marshall({
