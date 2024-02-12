@@ -74,17 +74,17 @@ const createAssignment = async (event) => {
       throw new Error("Incorrect Department!");
     }
 
-    const getEmployeeParams = {
-      TableName: "employee-Details-dev",
-      Key: marshall({
-        employeeId: requestBody.employeeId
-      })
-    };
+    // const getEmployeeParams = {
+    //   TableName: "employee-Details-dev",
+    //   Key: marshall({
+    //     employeeId: requestBody.employeeId
+    //   })
+    // };
 
-    const existingEmployee = await client.send(new GetItemCommand(getEmployeeParams));
-    if (!existingEmployee.Item) {
-      throw new Error("Employee not found in the employee-Details-dev table.");
-    }
+    // const existingEmployee = await client.send(new GetItemCommand(getEmployeeParams));
+    // if (!existingEmployee.Item) {
+    //   throw new Error("Employee not found in the employee-Details-dev table.");
+    // }
 
     // Fetch the highest highestSerialNumber from the DynamoDB table
     const highestSerialNumber = await getHighestSerialNumber();
