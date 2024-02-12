@@ -86,11 +86,10 @@ const createAssignment = async (event) => {
     //   throw new Error("Employee not found in the employee-Details-dev table.");
     // }
 
-    // Fetch the highest highestSerialNumber from the DynamoDB table
     const highestSerialNumber = await getHighestSerialNumber();
-const nextSerialNumber = highestSerialNumber !== undefined ? (parseInt(highestSerialNumber) + 1).toString() : "1";
+const nextSerialNumber = highestSerialNumber !== "NaN" ? (parseInt(highestSerialNumber) + 1).toString() : "1";
 
-if (!nextSerialNumber) {
+if (isNaN(parseInt(nextSerialNumber))) {
   throw new Error("Unable to determine next serial number for assignment.");
 }
 
@@ -105,16 +104,17 @@ async function getHighestSerialNumber() {
   try {
     const result = await client.send(new ScanCommand(params));
     if (result.Items.length === 0) {
-      return 0; // If no records found, return "0" as a string
+      return "0"; // If no records found, return "0" as a string
     } else {
       // Parse and return the highest serial number without incrementing
-      return result.Items[0].assignmentId; // If assignmentId is a string
+      return result.Items[0].assignmentId.S; // If assignmentId is stored as a string
     }
   } catch (error) {
     console.error("Error retrieving highest serial number:", error);
     throw error; // Propagate the error up the call stack
   }
 }
+
     console.log("Request Body:", requestBody);
 
     const getItemParams = {
