@@ -95,36 +95,37 @@ const createAssignment = async (event) => {
     }
 
     const highestSerialNumber = await getHighestSerialNumber();
-    const nextSerialNumber =
-      highestSerialNumber !== "NaN"
-        ? (parseInt(highestSerialNumber) + 1).toString()
-        : "1";
+const nextSerialNumber =
+  highestSerialNumber !== null
+    ? parseInt(highestSerialNumber) + 1
+    : 1;
 
-    if (isNaN(parseInt(nextSerialNumber))) {
-      throw new Error("Unable to determine next serial number for assignment.");
+if (isNaN(nextSerialNumber)) {
+  throw new Error("Unable to determine next serial number for assignment.");
+}
+
+async function getHighestSerialNumber() {
+  const params = {
+    TableName: process.env.ASSIGNMENTS_TABLE,
+    ProjectionExpression: "assignmentId",
+    Limit: 1,
+    ScanIndexForward: false, // Sort in descending order to get the highest serial number first
+  };
+
+  try {
+    const result = await client.send(new ScanCommand(params));
+    if (result.Items.length === 0) {
+      return null; // If no records found, return null
+    } else {
+      // Parse and return the highest serial number without incrementing
+      return parseInt(result.Items[0].assignmentId); // Parse as a number
     }
+  } catch (error) {
+    console.error("Error retrieving highest serial number:", error);
+    throw error; // Propagate the error up the call stack
+  }
+}
 
-    async function getHighestSerialNumber() {
-      const params = {
-        TableName: process.env.ASSIGNMENTS_TABLE,
-        ProjectionExpression: "assignmentId",
-        Limit: 1,
-        ScanIndexForward: false, // Sort in descending order to get the highest serial number first
-      };
-
-      try {
-        const result = await client.send(new ScanCommand(params));
-        if (result.Items.length === 0) {
-          return "0"; // If no records found, return "0" as a string
-        } else {
-          // Parse and return the highest serial number without incrementing
-          return result.Items[0].assignmentId.S; // If assignmentId is stored as a string
-        }
-      } catch (error) {
-        console.error("Error retrieving highest serial number:", error);
-        throw error; // Propagate the error up the call stack
-      }
-    }
     const getItemParams = async (employeeId) => {
       const params = {
         TableName: process.env.ASSIGNMENTS_TABLE,

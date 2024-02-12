@@ -84,7 +84,7 @@ resources:
           - AttributeName: employeeId
             AttributeType: S
           - AttributeName: assignmentId
-            AttributeType: S
+            AttributeType: N
         KeySchema:
           - AttributeName: assignmentId
             KeyType: HASH
