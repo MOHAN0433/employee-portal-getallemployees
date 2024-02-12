@@ -43,7 +43,7 @@ const createAssignment = async (event) => {
         TableName: process.env.ASSIGNMENTS_TABLE,
         Key: marshall({
           employeeId: requestBody.employeeId,
-          assignmentId: requestBody.assignmentId
+          assignmentId: nextSerialNumber
         })
       };
 
