@@ -100,9 +100,9 @@ const nextSerialNumber =
     ? parseInt(highestSerialNumber) + 1
     : 1;
 
-if (isNaN(nextSerialNumber)) {
-  throw new Error("Unable to determine next serial number for assignment.");
-}
+// if (isNaN(nextSerialNumber)) {
+//   throw new Error("Unable to determine next serial number for assignment.");
+// }
 
 async function getHighestSerialNumber() {
   const params = {
@@ -126,22 +126,22 @@ async function getHighestSerialNumber() {
   }
 }
 
-    const getItemParams = async (employeeId) => {
-      const params = {
-        TableName: process.env.ASSIGNMENTS_TABLE,
-        FilterExpression: "employeeId = :employeeIdValue",
-        ExpressionAttributeValues: {
-          ":employeeIdValue": { S: employeeId },
-        },
-        ProjectionExpression: "employeeId",
-      };
-      const command = new ScanCommand(params);
-      const data = await client.send(command);
-      return data.Items.length > 0;
-    };
-    if (getItemParams.Item) {
-      throw new Error("Assignment already exists for this employee.");
-    }
+    // const getItemParams = async (employeeId) => {
+    //   const params = {
+    //     TableName: process.env.ASSIGNMENTS_TABLE,
+    //     FilterExpression: "employeeId = :employeeIdValue",
+    //     ExpressionAttributeValues: {
+    //       ":employeeIdValue": { S: employeeId },
+    //     },
+    //     ProjectionExpression: "employeeId",
+    //   };
+    //   const command = new ScanCommand(params);
+    //   const data = await client.send(command);
+    //   return data.Items.length > 0;
+    // };
+    // if (getItemParams.Item) {
+    //   throw new Error("Assignment already exists for this employee.");
+    // }
     //   const getItemParams = {
     //     TableName: process.env.ASSIGNMENTS_TABLE,
     //     Key: marshall({
