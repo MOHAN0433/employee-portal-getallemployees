@@ -39,19 +39,6 @@ const createAssignment = async (event) => {
       throw new Error("Required fields are missing.");
     }
 
-    const getItemParams = {
-        TableName: process.env.ASSIGNMENTS_TABLE,
-        Key: marshall({
-          employeeId: requestBody.employeeId,
-          assignmentId: nextSerialNumber
-        })
-      };
-
-    const existingAssignment = await client.send(new GetItemCommand(getItemParams));
-    if (existingAssignment.Item) {
-      throw new Error("Assignment already exists for this employee.");
-    }
-
     const existingAssignmentParams = {
       TableName: process.env.ASSIGNMENTS_TABLE,
       KeyConditionExpression: "employeeId = :employeeId",
@@ -130,6 +117,18 @@ async function getHighestSerialNumber() {
 }
     console.log("Request Body:", requestBody);
 
+    const getItemParams = {
+      TableName: process.env.ASSIGNMENTS_TABLE,
+      Key: marshall({
+        employeeId: requestBody.employeeId,
+        assignmentId: nextSerialNumber
+      })
+    };
+
+  const existingAssignment = await client.send(new GetItemCommand(getItemParams));
+  if (existingAssignment.Item) {
+    throw new Error("Assignment already exists for this employee.");
+  }
 
     const params = {
       TableName: process.env.ASSIGNMENTS_TABLE, // Use ASSIGNMENTS_TABLE environment variable
