@@ -133,33 +133,18 @@ async function getHighestSerialNumber() {
   }
 }
 
-const existingAssignment = await getAssignmentByEmployeeId(requestBody.employeeId);
-    if (existingAssignment) {
-      throw new Error("An assignment already exists for this employee.");
-      // You can also choose to update the existing assignment here if needed
-    }
-    async function getAssignmentByEmployeeId(employeeId) {
-      const params = {
-        TableName: process.env.ASSIGNMENTS_TABLE,
-        Key: {
-          // Provide the correct key structure that matches your table's primary key schema
-          employeeId: { S: employeeId } // Assuming employeeId is a string (S)
-        },
-      };
-    
-      try {
-        const result = await client.send(new GetItemCommand(params));
-        if (result.Item) {
-          return unmarshall(result.Item);
-        }
-        return null;
-      } catch (error) {
-        console.error("Error retrieving assignment by employeeId:", error);
-        throw error;
-      }
-    }
-    
+const getItemParams = {
+  TableName: process.env.ASSIGNMENTS_TABLE,
+  Key: marshall({
+    assignmentId: nextSerialNumber,
+    employeeId: requestBody.employeeId
+  })
+};
 
+const existingAssignment = await client.send(new GetItemCommand(getItemParams));
+if (existingAssignment.Item) {
+throw new Error("Assignment already exists for this employee.");
+}
     const params = {
       TableName: process.env.ASSIGNMENTS_TABLE, // Use ASSIGNMENTS_TABLE environment variable
       Item: marshall({
