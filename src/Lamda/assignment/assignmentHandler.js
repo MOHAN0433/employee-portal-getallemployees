@@ -41,9 +41,9 @@ const createAssignment = async (event) => {
 
     const existingAssignmentParams = {
       TableName: process.env.ASSIGNMENTS_TABLE,
-      KeyConditionExpression: "employeeId = :employeeId",
+      KeyConditionExpression: "assignmentId = :assignmentId",
       ExpressionAttributeValues: {
-        ":employeeId": { S: requestBody.employeeId }
+        ":assignmentId": { S: requestBody.assignmentId }
       }
     };
 
