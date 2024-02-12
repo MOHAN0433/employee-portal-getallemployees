@@ -95,6 +95,8 @@ const createAssignment = async (event) => {
     }
 
     const highestSerialNumber = await getHighestSerialNumber();
+    console.log("Highest Serial Number:", highestSerialNumber);
+
 const nextSerialNumber =
   highestSerialNumber !== null
     ? parseInt(highestSerialNumber) + 1
