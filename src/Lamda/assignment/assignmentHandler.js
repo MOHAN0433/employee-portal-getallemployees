@@ -168,12 +168,21 @@ async function getHighestSerialNumber() {
         ":assignmentIdValue": nextSerialNumber,
       },
     };
-    const existingAssignments = await client.send(
-      new QueryCommand(existingAssignmentParams)
-    );
-    if (existingAssignments.Items && existingAssignments.Items.length > 0) {
-      throw new Error("An assignment already exists for this employee.");
+    
+    console.log("Query Parameters:", existingAssignmentParams);
+    
+    try {
+      const existingAssignments = await client.send(new QueryCommand(existingAssignmentParams));
+      console.log("DynamoDB Query Result:", existingAssignments);
+      
+      if (existingAssignments.Items && existingAssignments.Items.length > 0) {
+        throw new Error("An assignment already exists for this employee.");
+      }
+    } catch (error) {
+      console.error("Error querying DynamoDB:", error);
+      throw error; // Propagate the error up the call stack
     }
+    
     const params = {
       TableName: process.env.ASSIGNMENTS_TABLE, // Use ASSIGNMENTS_TABLE environment variable
       Item: marshall({
