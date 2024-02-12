@@ -116,11 +116,14 @@ async function getHighestSerialNumber() {
 
   try {
     const result = await client.send(new ScanCommand(params));
+    console.log("DynamoDB Result:", result); // Add this line to see the DynamoDB response
     if (result.Items.length === 0) {
       return null; // If no records found, return null
     } else {
       // Parse and return the highest serial number without incrementing
-      return parseInt(result.Items[0].assignmentId); // Parse as a number
+      const assignmentId = result.Items[0].assignmentId;
+      console.log("Assignment ID from DynamoDB:", assignmentId); // Add this line to see the retrieved assignmentId
+      return parseInt(assignmentId); // Parse as a number
     }
   } catch (error) {
     console.error("Error retrieving highest serial number:", error);
