@@ -96,7 +96,7 @@ async function getHighestSerialNumber() {
       TableName: process.env.ASSIGNMENTS_TABLE,
       Key: marshall({
         employeeId: requestBody.employeeId,
-        assignmentId: nextSerialNumber
+        assignmentId: highestSerialNumber
       })
     };
 
@@ -109,7 +109,7 @@ async function getHighestSerialNumber() {
     TableName: process.env.ASSIGNMENTS_TABLE,
     KeyConditionExpression: "assignmentId = :assignmentId",
     ExpressionAttributeValues: {
-      ":assignmentId": { S: nextSerialNumber }
+      ":assignmentId": { S: highestSerialNumber }
     }
   };
 
