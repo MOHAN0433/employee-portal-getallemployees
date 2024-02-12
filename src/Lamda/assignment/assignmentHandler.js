@@ -117,7 +117,6 @@ async function getHighestSerialNumber() {
   if (existingAssignment.Item) {
     throw new Error("Assignment already exists for this employee.");
   }
-
     const params = {
       TableName: process.env.ASSIGNMENTS_TABLE, // Use ASSIGNMENTS_TABLE environment variable
       Item: marshall({
