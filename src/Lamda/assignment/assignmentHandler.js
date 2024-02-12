@@ -143,7 +143,7 @@ const getItemParams = {
 console.log("getItemParams:", getItemParams);
 
 const existingAssignment = await client.send(new GetItemCommand(getItemParams));
-console.log("Existing Assignment:", existingAssignment);
+//console.log("Existing Assignment:", existingAssignment);
 if (existingAssignment.Item && existingAssignment.Item.employeeId.S === requestBody.employeeId) {
   throw new Error("Assignment already exists for this employee.");
 }
