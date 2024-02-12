@@ -39,19 +39,6 @@ const createAssignment = async (event) => {
       throw new Error("Required fields are missing.");
     }
 
-    const existingAssignmentParams = {
-      TableName: process.env.ASSIGNMENTS_TABLE,
-      KeyConditionExpression: "assignmentId = :assignmentId",
-      ExpressionAttributeValues: {
-        ":assignmentId": { S: requestBody.assignmentId }
-      }
-    };
-
-    const existingAssignments = await client.send(new QueryCommand(existingAssignmentParams));
-    if (existingAssignments.Items && existingAssignments.Items.length > 0) {
-      throw new Error("An assignment already exists for this employee.");
-    }
-
     if(requestBody.branchOffice === null || !["San Antonio(USA)", "Bangalore(INDIA)"].includes(requestBody.branchOffice)){
       throw new Error("Incorrect BranchOffice");
     }
@@ -116,6 +103,19 @@ async function getHighestSerialNumber() {
   const existingAssignment = await client.send(new GetItemCommand(getItemParams));
   if (existingAssignment.Item) {
     throw new Error("Assignment already exists for this employee.");
+  }
+
+  const existingAssignmentParams = {
+    TableName: process.env.ASSIGNMENTS_TABLE,
+    KeyConditionExpression: "assignmentId = :assignmentId",
+    ExpressionAttributeValues: {
+      ":assignmentId": { S: requestBody.assignmentId }
+    }
+  };
+
+  const existingAssignments = await client.send(new QueryCommand(existingAssignmentParams));
+  if (existingAssignments.Items && existingAssignments.Items.length > 0) {
+    throw new Error("An assignment already exists for this employee.");
   }
     const params = {
       TableName: process.env.ASSIGNMENTS_TABLE, // Use ASSIGNMENTS_TABLE environment variable
