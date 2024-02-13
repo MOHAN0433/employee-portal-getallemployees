@@ -32,10 +32,15 @@ const createAssignment = async (event) => {
       "branchOffice",
       "coreTechnology",
       "billableResource",
-      "onsite",
     ];
     if (!requiredFields.every((field) => requestBody[field])) {
       throw new Error("Required fields are missing.");
+    }
+
+    // Set onsite based on branchOffice
+    let onsite = "No"; // Default value
+    if (requestBody.branchOffice === "San Antonio(USA)") {
+      onsite = "Yes";
     }
 
     if (
