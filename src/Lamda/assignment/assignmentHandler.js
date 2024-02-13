@@ -191,7 +191,7 @@ await checkEmployeeExistence(requestBody.employeeId);
         // framework: requestBody.framework || null,
         //reportingManager: typeof requestBody.reportingManager === 'string' ? requestBody.reportingManager : throw new error,
         reportingManager: requestBody.reportingManager,
-        onsite: requestBody.onsite,
+        onsite: onsite,
         billableResource: requestBody.billableResource,
         createdDateTime: formattedDate,
       }),
