@@ -157,6 +157,26 @@ async function getAssignmentByEmployeeId(employeeId) {
   }
 }
 
+const checkEmployeeExistence = async (employeeId) => {
+  const params = {
+    TableName: process.env.EMPLOYEE_TABLE,
+    Key: marshall({
+      employeeId: employeeId
+    })
+  };
+
+  try {
+    const result = await client.send(new GetItemCommand(params));
+    if (!result.Item) {
+      throw new Error("Employee not found.");
+    }
+  } catch (error) {
+    console.error("Error checking employee existence:", error);
+    throw error;
+  }
+}
+await checkEmployeeExistence(requestBody.employeeId);
+
     const params = {
       TableName: process.env.ASSIGNMENTS_TABLE, // Use ASSIGNMENTS_TABLE environment variable
       Item: marshall({
