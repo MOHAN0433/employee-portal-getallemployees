@@ -134,6 +134,11 @@ async function getHighestSerialNumber() {
 }
 
 // Check if an assignment already exists for the employee
+const existingAssignment = await getAssignmentByEmployeeId(requestBody.employeeId);
+if (existingAssignment) {
+  throw new Error("An assignment already exists for this employee.");
+}
+
 async function getAssignmentByEmployeeId(employeeId) {
   const params = {
     TableName: process.env.ASSIGNMENTS_TABLE,
