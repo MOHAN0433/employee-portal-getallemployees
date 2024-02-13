@@ -133,20 +133,30 @@ async function getHighestSerialNumber() {
   }
 }
 
-const getItemParams = {
-  TableName: process.env.ASSIGNMENTS_TABLE,
-  Key: marshall({
-    assignmentId: { N: String(highestSerialNumber) },
-    employeeId: { S: requestBody.employeeId }
-  })
-};
-console.log("getItemParams:", getItemParams);
-
-const existingAssignment = await client.send(new GetItemCommand(getItemParams));
-console.log("Existing Assignment:", existingAssignment);
-if (existingAssignment.Item && existingAssignment.Item.employeeId.S === requestBody.employeeId) {
-  throw new Error("Assignment already exists for this employee.");
+// Check if an assignment already exists for the employee
+const existingAssignment = await getAssignmentByEmployeeId(requestBody.employeeId);
+if (existingAssignment) {
+  throw new Error("An assignment already exists for this employee.");
 }
+
+async function getAssignmentByEmployeeId(employeeId) {
+  const params = {
+    TableName: process.env.ASSIGNMENTS_TABLE,
+    KeyConditionExpression: "employeeId = :employeeId",
+    ExpressionAttributeValues: {
+      ":employeeId": employeeId
+    }
+  };
+
+  try {
+    const result = await client.send(new QueryCommand(params));
+    return result.Items.length > 0;
+  } catch (error) {
+    console.error("Error retrieving assignment by employeeId:", error);
+    throw error;
+  }
+}
+
     const params = {
       TableName: process.env.ASSIGNMENTS_TABLE, // Use ASSIGNMENTS_TABLE environment variable
       Item: marshall({

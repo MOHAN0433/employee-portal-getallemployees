@@ -1,12 +1,15 @@
 service: employee-portal-service
+
 provider:
   name: aws
   runtime: nodejs18.x
   stage: dev
   region: us-east-1
+
   environment:
     EMPLOYEE_TABLE: ${self:custom.employeeTableName}
     ASSIGNMENTS_TABLE: ${self:custom.assignmentTableName}
+
   iamRoleStatements:
     - Effect: "Allow"
       Action:
@@ -19,11 +22,14 @@ provider:
       Resource:
         - !GetAtt EmployeeTable.Arn
         - !GetAtt AssignmentTable.Arn
+
 custom:
   employeeTableName: employee-Details-${self:provider.stage}
   assignmentTableName: assignment-Details-${self:provider.stage}
+
 plugins:
   - serverless-iam-roles-per-function
+
 functions:
   employeeGet:
     handler: src/Lamda/employee/employeeHandler.getEmployee
@@ -34,6 +40,7 @@ functions:
       - http:
           path: employee/{employeeId}
           method: GET
+
   employeeCreate:
     handler: src/Lamda/employee/employeeHandler.createEmployee
     name: employeeCreate
@@ -43,6 +50,7 @@ functions:
       - http:
           path: employee
           method: POST
+
   employeeGetAll:
     handler: src/Lamda/employee/employeeHandler.getAllEmployees
     name: employeeGetAll
@@ -52,6 +60,7 @@ functions:
       - http:
           path: employees
           method: GET
+
   assignmentCreate:
     handler: src/Lamda/assignment/assignmentHandler.createAssignment
     name: assignmentCreate
@@ -61,6 +70,7 @@ functions:
       - http:
           path: assignment
           method: POST
+
 resources:
   Resources:
     EmployeeTable:
@@ -76,15 +86,16 @@ resources:
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
+
     AssignmentTable:
       Type: AWS::DynamoDB::Table
       Properties:
         TableName: ${self:custom.assignmentTableName}
         AttributeDefinitions:
-          - AttributeName: employeeId
-            AttributeType: S
           - AttributeName: assignmentId
             AttributeType: N
+          - AttributeName: employeeId
+            AttributeType: S
         KeySchema:
           - AttributeName: assignmentId
             KeyType: HASH
@@ -93,3 +104,13 @@ resources:
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
+        GlobalSecondaryIndexes:
+          - IndexName: EmployeeIndex
+            KeySchema:
+              - AttributeName: employeeId
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: 1
+              WriteCapacityUnits: 1
