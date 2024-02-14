@@ -100,16 +100,19 @@ const createEmployee = async (event) => {
         const params = {
           TableName: process.env.ASSIGNMENTS_TABLE,
           ProjectionExpression: "assignmentId",
-          Limit: 1,
-          ScanIndexForward: false, // Sort in descending order to get the highest serial number first
+          Limit: 100, // Increase the limit to retrieve more items for sorting
         };
       
         try {
           const result = await client.send(new ScanCommand(params));
+          
+          // Sort the items in descending order based on assignmentId
           const sortedItems = result.Items.sort((a, b) => {
             return parseInt(b.assignmentId.N) - parseInt(a.assignmentId.N);
           });
-          
+      
+          console.log("Sorted Items:", sortedItems); // Log the sorted items
+      
           if (sortedItems.length === 0) {
             return 0; // If no records found, return null
           } else {
@@ -122,6 +125,7 @@ const createEmployee = async (event) => {
           throw error; // Propagate the error up the call stack
         }
       }
+      
     const assignmentParams = {
       TableName: process.env.ASSIGNMENTS_TABLE, // Use ASSIGNMENTS_TABLE environment variable
       Item: marshall({
