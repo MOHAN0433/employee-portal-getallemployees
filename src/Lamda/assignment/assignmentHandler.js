@@ -36,22 +36,19 @@ const createAssignment = async (event) => {
     if (!requiredFields.every((field) => requestBody[field])) {
       throw new Error("Required fields are missing.");
     }
-
     // Set onsite based on branchOffice
     let onsite = "No"; // Default value
-    if (requestBody.branchOffice === "San Antonio(USA)") {
+    if (requestBody.branchOffice === "San Antonio, USA") {
       onsite = "Yes";
     }
-
     if (
       requestBody.branchOffice === null ||
-      !["San Antonio(USA)", "Bangalore(INDIA)"].includes(
+      !["San Antonio, USA", "Bangalore, INDIA"].includes(
         requestBody.branchOffice
       )
     ) {
       throw new Error("Incorrect BranchOffice");
     }
-
     if (
       requestBody.billableResource === null ||
       !["Yes", "No"].includes(requestBody.billableResource)
@@ -84,7 +81,6 @@ const createAssignment = async (event) => {
     ) {
       throw new Error("Incorrect Designation!");
     }
-
     if (
       requestBody.department === null ||
       !["IT", "Non- IT", "Sales"].includes(requestBody.department)
@@ -95,85 +91,80 @@ const createAssignment = async (event) => {
     const highestSerialNumber = await getHighestSerialNumber();
     console.log("Highest Serial Number:", highestSerialNumber);
 
-const nextSerialNumber =
-  highestSerialNumber !== null
-    ? parseInt(highestSerialNumber) + 1
-    : 1;
+    const nextSerialNumber =
+      highestSerialNumber !== null ? parseInt(highestSerialNumber) + 1 : 1;
+    async function getHighestSerialNumber() {
+      const params = {
+        TableName: process.env.ASSIGNMENTS_TABLE,
+        ProjectionExpression: "assignmentId",
+        Limit: 1,
+        ScanIndexForward: false, // Sort in descending order to get the highest serial number first
+      };
 
-// if (isNaN(nextSerialNumber)) {
-//   throw new Error("Unable to determine next serial number for assignment.");
-// }
-
-async function getHighestSerialNumber() {
-  const params = {
-    TableName: process.env.ASSIGNMENTS_TABLE,
-    ProjectionExpression: "assignmentId",
-    Limit: 1,
-    ScanIndexForward: false, // Sort in descending order to get the highest serial number first
-  };
-
-  try {
-    const result = await client.send(new ScanCommand(params));
-    console.log("DynamoDB Result:", result); // Add this line to see the DynamoDB response
-    if (result.Items.length === 0) {
-      return 0; // If no records found, return null
-    } else {
-      // Parse and return the highest serial number without incrementing
-      const assignmentIdObj = result.Items[0].assignmentId;
-      console.log("Assignment ID from DynamoDB:", assignmentIdObj); // Add this line to see the retrieved assignmentId object
-      const assignmentId = parseInt(assignmentIdObj.N); // Access the N property and parse as a number
-      console.log("Parsed Assignment ID:", assignmentId); // Log the parsed assignmentId
-      return assignmentId;
+      try {
+        const result = await client.send(new ScanCommand(params));
+        console.log("DynamoDB Result:", result); // Add this line to see the DynamoDB response
+        if (result.Items.length === 0) {
+          return 0; // If no records found, return null
+        } else {
+          // Parse and return the highest serial number without incrementing
+          const assignmentIdObj = result.Items[0].assignmentId;
+          console.log("Assignment ID from DynamoDB:", assignmentIdObj); // Add this line to see the retrieved assignmentId object
+          const assignmentId = parseInt(assignmentIdObj.N); // Access the N property and parse as a number
+          console.log("Parsed Assignment ID:", assignmentId); // Log the parsed assignmentId
+          return assignmentId;
+        }
+      } catch (error) {
+        console.error("Error retrieving highest serial number:", error);
+        throw error; // Propagate the error up the call stack
+      }
     }
-  } catch (error) {
-    console.error("Error retrieving highest serial number:", error);
-    throw error; // Propagate the error up the call stack
-  }
-}
-
-// Check if an assignment already exists for the employee
-const existingAssignment = await getAssignmentByEmployeeId(requestBody.employeeId);
-if (existingAssignment) {
-  throw new Error("An assignment already exists for this employee.");
-}
-
-async function getAssignmentByEmployeeId(employeeId) {
-  const params = {
-    TableName: process.env.ASSIGNMENTS_TABLE,
-    FilterExpression: "employeeId = :employeeId",
-    ExpressionAttributeValues: {
-      ":employeeId": { S: employeeId } // Assuming employeeId is a string
+    
+    // Check if an assignment already exists for the employee
+    const existingAssignment = await getAssignmentByEmployeeId(
+      requestBody.employeeId
+    );
+    if (existingAssignment) {
+      throw new Error("An assignment already exists for this employee.");
     }
-  };
 
-  try {
-    const result = await client.send(new ScanCommand(params));
-    return result.Items.length > 0;
-  } catch (error) {
-    console.error("Error retrieving assignment by employeeId:", error);
-    throw error;
-  }
-}
+    async function getAssignmentByEmployeeId(employeeId) {
+      const params = {
+        TableName: process.env.ASSIGNMENTS_TABLE,
+        FilterExpression: "employeeId = :employeeId",
+        ExpressionAttributeValues: {
+          ":employeeId": { S: employeeId }, // Assuming employeeId is a string
+        },
+      };
 
-const checkEmployeeExistence = async (employeeId) => {
-  const params = {
-    TableName: process.env.EMPLOYEE_TABLE,
-    Key: marshall({
-      employeeId: employeeId
-    })
-  };
-
-  try {
-    const result = await client.send(new GetItemCommand(params));
-    if (!result.Item) {
-      throw new Error("Employee not found.");
+      try {
+        const result = await client.send(new ScanCommand(params));
+        return result.Items.length > 0;
+      } catch (error) {
+        console.error("Error retrieving assignment by employeeId:", error);
+        throw error;
+      }
     }
-  } catch (error) {
-    console.error("Error checking employee existence:", error);
-    throw error;
-  }
-}
-await checkEmployeeExistence(requestBody.employeeId);
+
+    const checkEmployeeExistence = async (employeeId) => {
+      const params = {
+        TableName: process.env.EMPLOYEE_TABLE,
+        Key: marshall({
+          employeeId: employeeId,
+        }),
+      };
+
+      try {
+        const result = await client.send(new GetItemCommand(params));
+        if (!result.Item) {
+          throw new Error("Employee not found.");
+        }
+      } catch (error) {
+        console.error("Error checking employee existence:", error);
+        throw error;
+      }
+    };
+    await checkEmployeeExistence(requestBody.employeeId);
 
     const params = {
       TableName: process.env.ASSIGNMENTS_TABLE, // Use ASSIGNMENTS_TABLE environment variable

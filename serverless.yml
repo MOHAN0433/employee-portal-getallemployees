@@ -1,15 +1,12 @@
 service: employee-portal-service
-
 provider:
   name: aws
   runtime: nodejs18.x
   stage: dev
   region: us-east-1
-
   environment:
     EMPLOYEE_TABLE: ${self:custom.employeeTableName}
     ASSIGNMENTS_TABLE: ${self:custom.assignmentTableName}
-
   iamRoleStatements:
     - Effect: "Allow"
       Action:
@@ -22,25 +19,21 @@ provider:
       Resource:
         - !GetAtt EmployeeTable.Arn
         - !GetAtt AssignmentTable.Arn
-
 custom:
   employeeTableName: employee-Details-${self:provider.stage}
   assignmentTableName: assignment-Details-${self:provider.stage}
-
 plugins:
   - serverless-iam-roles-per-function
-
 functions:
   employeeGet:
     handler: src/Lamda/employee/employeeHandler.getEmployee
-    name: getEmployeeDetails
+    name: employeeGet
     memorySize: 128
     timeout: 120
     events:
       - http:
-          path: employee/{employeeId}
+          path: employee/get/{employeeId}
           method: GET
-
   employeeCreate:
     handler: src/Lamda/employee/employeeHandler.createEmployee
     name: employeeCreate
@@ -50,7 +43,15 @@ functions:
       - http:
           path: employee
           method: POST
-
+  employeeUpdate:
+    handler: src/Lamda/employee/employeeHandler.updateEmployee
+    name: employeeUpdate
+    memorySize: 128
+    timeout: 120
+    events:
+      - http:
+          path: employee/{employeeId}
+          method: PUT
   employeeGetAll:
     handler: src/Lamda/employee/employeeHandler.getAllEmployees
     name: employeeGetAll
@@ -60,7 +61,6 @@ functions:
       - http:
           path: employees
           method: GET
-
   assignmentCreate:
     handler: src/Lamda/assignment/assignmentHandler.createAssignment
     name: assignmentCreate
@@ -70,7 +70,6 @@ functions:
       - http:
           path: assignment
           method: POST
-
 resources:
   Resources:
     EmployeeTable:
@@ -86,7 +85,6 @@ resources:
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
-
     AssignmentTable:
       Type: AWS::DynamoDB::Table
       Properties:

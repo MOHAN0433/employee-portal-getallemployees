@@ -69,9 +69,75 @@ const createEmployee = async (event) => {
       }),
     };
     const createResult = await client.send(new PutItemCommand(params));
+
+    const requiredAssignmentFields = [
+      "designation",
+      "branchOffice",
+    ];
+    if (!requiredAssignmentFields.every((field) => requestBody[field])) {
+      throw new Error("Required Assignment Fields are missing.");
+    }
+
+    // Set onsite based on branchOffice
+    let onsite = "No"; // Default value
+    if (requestBody.branchOffice === "San Antonio, USA") {
+      onsite = "Yes";
+    }
+    if (
+      requestBody.branchOffice === null ||
+      !["San Antonio, USA", "Bangalore, INDIA"].includes(
+        requestBody.branchOffice
+      )
+    ) {
+      throw new Error("Incorrect BranchOffice");
+    }
+
+    const highestSerialNumber = await getHighestSerialNumber();
+    console.log("Highest Serial Number:", highestSerialNumber);
+    const nextSerialNumber =
+      highestSerialNumber !== null ? parseInt(highestSerialNumber) + 1 : 1;
+    async function getHighestSerialNumber() {
+      const params = {
+        TableName: process.env.ASSIGNMENTS_TABLE,
+        ProjectionExpression: "assignmentId",
+        Limit: 1,
+        ScanIndexForward: false, // Sort in descending order to get the highest serial number first
+      };
+
+      try {
+        const result = await client.send(new ScanCommand(params));
+        console.log("DynamoDB Result:", result); // Add this line to see the DynamoDB response
+        if (result.Items.length === 0) {
+          return 0; // If no records found, return null
+        } else {
+          // Parse and return the highest serial number without incrementing
+          const assignmentIdObj = result.Items[0].assignmentId;
+          console.log("Assignment ID from DynamoDB:", assignmentIdObj); // Add this line to see the retrieved assignmentId object
+          const assignmentId = parseInt(assignmentIdObj.N); // Access the N property and parse as a number
+          console.log("Parsed Assignment ID:", assignmentId); // Log the parsed assignmentId
+          return assignmentId;
+        }
+      } catch (error) {
+        console.error("Error retrieving highest serial number:", error);
+        throw error; // Propagate the error up the call stack
+      }
+    }
+    const assignmentParams = {
+      TableName: process.env.ASSIGNMENTS_TABLE, // Use ASSIGNMENTS_TABLE environment variable
+      Item: marshall({
+        assignmentId: nextSerialNumber,
+        employeeId: requestBody.employeeId,
+        branchOffice: requestBody.branchOffice,
+        designation: requestBody.designation,
+        onsite: onsite,
+        createdDateTime: formattedDate,
+      }),
+    };
+
+    const createAssignmentResult = await client.send(new PutItemCommand(assignmentParams));
+  
     response.body = JSON.stringify({
-      message: httpStatusMessages.SUCCESSFULLY_CREATED_EMPLOYEE_DETAILS,
-      createResult,
+      message: httpStatusMessages.SUCCESSFULLY_CREATED_EMPLOYEE_DETAIL,
     });
   } catch (e) {
     console.error(e);
