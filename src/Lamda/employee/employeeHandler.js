@@ -96,32 +96,32 @@ const createEmployee = async (event) => {
     console.log("Highest Serial Number:", highestSerialNumber);
     const nextSerialNumber =
       highestSerialNumber !== null ? parseInt(highestSerialNumber) + 1 : 1;
-    async function getHighestSerialNumber() {
-      const params = {
-        TableName: process.env.ASSIGNMENTS_TABLE,
-        ProjectionExpression: "assignmentId",
-        Limit: 1,
-        ScanIndexForward: false, // Sort in descending order to get the highest serial number first
-      };
-
-      try {
-        const result = await client.send(new ScanCommand(params));
-        console.log("DynamoDB Result:", result); // Add this line to see the DynamoDB response
-        if (result.Items.length === 0) {
-          return 0; // If no records found, return null
-        } else {
-          // Parse and return the highest serial number without incrementing
-          const assignmentIdObj = result.Items[0].assignmentId;
-          console.log("Assignment ID from DynamoDB:", assignmentIdObj); // Add this line to see the retrieved assignmentId object
-          const assignmentId = parseInt(assignmentIdObj.N); // Access the N property and parse as a number
-          console.log("Parsed Assignment ID:", assignmentId); // Log the parsed assignmentId
-          return assignmentId;
+      async function getHighestSerialNumber() {
+        const params = {
+          TableName: process.env.ASSIGNMENTS_TABLE,
+          ProjectionExpression: "assignmentId",
+          Limit: 1,
+          ScanIndexForward: false, // Sort in descending order to get the highest serial number first
+        };
+      
+        try {
+          const result = await client.send(new ScanCommand(params));
+          const sortedItems = result.Items.sort((a, b) => {
+            return parseInt(b.assignmentId.N) - parseInt(a.assignmentId.N);
+          });
+          
+          if (sortedItems.length === 0) {
+            return 0; // If no records found, return null
+          } else {
+            const highestAssignmentId = parseInt(sortedItems[0].assignmentId.N);
+            console.log("Highest Assignment ID:", highestAssignmentId);
+            return highestAssignmentId;
+          }
+        } catch (error) {
+          console.error("Error retrieving highest serial number:", error);
+          throw error; // Propagate the error up the call stack
         }
-      } catch (error) {
-        console.error("Error retrieving highest serial number:", error);
-        throw error; // Propagate the error up the call stack
       }
-    }
     const assignmentParams = {
       TableName: process.env.ASSIGNMENTS_TABLE, // Use ASSIGNMENTS_TABLE environment variable
       Item: marshall({
@@ -138,6 +138,7 @@ const createEmployee = async (event) => {
   
     response.body = JSON.stringify({
       message: httpStatusMessages.SUCCESSFULLY_CREATED_EMPLOYEE_DETAIL,
+      createEmployee,
     });
   } catch (e) {
     console.error(e);
