@@ -1,19 +1,12 @@
-const {
-  DynamoDBClient,
-  PutItemCommand,
-  UpdateItemCommand,
-  DeleteItemCommand,
-  GetItemCommand,
-  ScanCommand,
-  QueryCommand,
-} = require("@aws-sdk/client-dynamodb");
+const { DynamoDBClient, PutItemCommand, UpdateItemCommand, DeleteItemCommand, GetItemCommand, ScanCommand, QueryCommand } = require("@aws-sdk/client-dynamodb");
 const { marshall } = require("@aws-sdk/util-dynamodb");
 const moment = require("moment");
 const client = new DynamoDBClient();
+const { httpStatusCodes, httpStatusMessages } = require("../../environment/appconfig");
+const { updateAssignmentAllowedFields } = require("../../validator/validateFields");
 const {
-  httpStatusCodes,
-  httpStatusMessages,
-} = require("../../environment/appconfig");
+  validateUpdateAssignmentDetails,
+} = require("../../validator/validateRequest");
 const currentDate = Date.now(); // get the current date and time in milliseconds
 const formattedDate = moment(currentDate).format("YYYY-MM-DD HH:mm:ss"); // formatting date
 
@@ -25,14 +18,7 @@ const createAssignment = async (event) => {
     console.log("Request Body:", requestBody);
 
     // Check for required fields
-    const requiredFields = [
-      "employeeId",
-      "department",
-      "designation",
-      "branchOffice",
-      "coreTechnology",
-      "billableResource",
-    ];
+    const requiredFields = ["employeeId", "department", "designation", "branchOffice", "coreTechnology", "billableResource"];
     if (!requiredFields.every((field) => requestBody[field])) {
       throw new Error("Required fields are missing.");
     }
@@ -41,18 +27,10 @@ const createAssignment = async (event) => {
     if (requestBody.branchOffice === "San Antonio, USA") {
       onsite = "Yes";
     }
-    if (
-      requestBody.branchOffice === null ||
-      !["San Antonio, USA", "Bangalore, INDIA"].includes(
-        requestBody.branchOffice
-      )
-    ) {
+    if (requestBody.branchOffice === null || !["San Antonio, USA", "Bangalore, INDIA"].includes(requestBody.branchOffice)) {
       throw new Error("Incorrect BranchOffice");
     }
-    if (
-      requestBody.billableResource === null ||
-      !["Yes", "No"].includes(requestBody.billableResource)
-    ) {
+    if (requestBody.billableResource === null || !["Yes", "No"].includes(requestBody.billableResource)) {
       throw new Error("billableResource should be either 'Yes' or 'No'!");
     }
 
@@ -81,18 +59,14 @@ const createAssignment = async (event) => {
     ) {
       throw new Error("Incorrect Designation!");
     }
-    if (
-      requestBody.department === null ||
-      !["IT", "Non- IT", "Sales"].includes(requestBody.department)
-    ) {
+    if (requestBody.department === null || !["IT", "Non- IT", "Sales"].includes(requestBody.department)) {
       throw new Error("Incorrect Department!");
     }
 
     const highestSerialNumber = await getHighestSerialNumber();
     console.log("Highest Serial Number:", highestSerialNumber);
 
-    const nextSerialNumber =
-      highestSerialNumber !== null ? parseInt(highestSerialNumber) + 1 : 1;
+    const nextSerialNumber = highestSerialNumber !== null ? parseInt(highestSerialNumber) + 1 : 1;
     async function getHighestSerialNumber() {
       const params = {
         TableName: process.env.ASSIGNMENTS_TABLE,
@@ -119,11 +93,9 @@ const createAssignment = async (event) => {
         throw error; // Propagate the error up the call stack
       }
     }
-    
+
     // Check if an assignment already exists for the employee
-    const existingAssignment = await getAssignmentByEmployeeId(
-      requestBody.employeeId
-    );
+    const existingAssignment = await getAssignmentByEmployeeId(requestBody.employeeId);
     if (existingAssignment) {
       throw new Error("An assignment already exists for this employee.");
     }
@@ -205,6 +177,110 @@ const createAssignment = async (event) => {
   return response;
 };
 
+const updateAssignment = async (event) => {
+  console.log("Update Assignment details");
+  const response = { statusCode: httpStatusCodes.SUCCESS };
+
+  try {
+    const requestBody = JSON.parse(event.body);
+    console.log("Request Body:", requestBody);
+    const currentDate = Date.now();
+    const formattedDate = moment(currentDate).format("MM-DD-YYYY HH:mm:ss");
+    const employeeId = event.pathParameters ? event.pathParameters.employeeId : null;
+    if (!employeeId) {
+      console.log("Employee Id is required");
+      throw new Error(httpStatusMessages.EMPLOYEE_ID_REQUIRED);
+    }
+
+    const getItemParams = {
+      TableName: process.env.EMPLOYEE_TABLE,
+      Key: marshall({ employeeId }),
+    };
+    const { Item } = await client.send(new GetItemCommand(getItemParams));
+    if (!Item) {
+      console.log(`Employee with employeeId ${employeeId} not found`);
+      response.statusCode = 404;
+      response.body = JSON.stringify({
+        message: `Employee with employeeId ${employeeId} not found`,
+      });
+      return response;
+    }
+
+    requestBody.updatedDateTime = formattedDate;
+
+    const objKeys = Object.keys(requestBody).filter((key) => updateAssignmentAllowedFields.includes(key));
+    console.log(`Employee with objKeys ${objKeys} `);
+    const validationResponse = validateUpdateAssignmentDetails(requestBody);
+    console.log(`valdation : ${validationResponse.validation} message: ${validationResponse.validationMessage} `);
+
+    if (!validationResponse.validation) {
+      console.log(validationResponse.validationMessage);
+      response.statusCode = 400;
+      response.body = JSON.stringify({
+        message: validationResponse.validationMessage,
+      });
+      return response;
+    }
+
+    // const officeEmailAddressExists = await isEmailNotEmployeeIdExists(requestBody.officeEmailAddress, employeeId);
+    // if (officeEmailAddressExists) {
+    //   console.log("officeEmailAddress already exists.");
+    //   response.statusCode = 400;
+    //   response.body = JSON.stringify({
+    //     message: "officeEmailAddress already exists.",
+    //   });
+    //   return response;
+    // }
+
+    let onsite = "No"; // Default value
+    if (requestBody.branchOffice === "San Antonio, USA") {
+      onsite = "Yes";
+    }
+
+    const params = {
+      TableName: process.env.EMPLOYEE_TABLE,
+      Key: marshall({ employeeId }),
+      UpdateExpression: `SET ${objKeys.map((_, index) => `#key${index} = :value${index}`).join(", ")}`,
+      ExpressionAttributeNames: objKeys.reduce(
+        (acc, key, index) => ({
+          ...acc,
+          [`#key${index}`]: key,
+        }),
+        {}
+      ),
+      ExpressionAttributeValues: marshall(
+        objKeys.reduce(
+          (acc, key, index) => ({
+            ...acc,
+            [`:value${index}`]: requestBody[key],
+          }),
+          {}
+        )
+      ),
+      ":updatedDateTime": requestBody.updatedDateTime,
+      ":onsite": onsite,
+
+    };
+
+    const updateResult = await client.send(new UpdateItemCommand(params));
+    console.log("Successfully updated Assignment details.");
+    response.body = JSON.stringify({
+      message: httpStatusMessages.SUCCESSFULLY_UPDATED_EMPLOYEE_DETAILS,
+      employeeId: employeeId,
+    });
+  } catch (e) {
+    console.error(e);
+    response.statusCode = 400;
+    response.body = JSON.stringify({
+      message: httpStatusMessages.FAILED_TO_UPDATED_EMPLOYEE_DETAILS,
+      employeeId: requestBody.employeeId, // If you want to include employeeId in the response
+      errorMsg: e.message,
+    });
+  }
+  return response;
+};
+
 module.exports = {
   createAssignment,
+  updateAssignment,
 };

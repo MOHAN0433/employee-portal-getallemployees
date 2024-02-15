@@ -60,7 +60,7 @@ const createEmployee = async (event) => {
         lastName: requestBody.lastName,
         dateOfBirth: requestBody.dateOfBirth,
         officeEmailAddress: requestBody.officeEmailAddress,
-        branchOffice: requestBody.branchOffice,
+        //branchOffice: requestBody.branchOffice,
         password: requestBody.password || null,
         gender: requestBody.gender || null,
         ssnNumber: requestBody.ssnNumber || null,
@@ -75,7 +75,7 @@ const createEmployee = async (event) => {
         contactNumber: requestBody.contactNumber || null,
         joiningDate: requestBody.joiningDate || null,
         emergencyContactPerson: requestBody.emergencyContactPerson || null,
-        designation: requestBody.designation || null,
+        //designation: requestBody.designation || null,
         emergencyContactNumber: requestBody.emergencyContactNumber || null,
         resignedDate: requestBody.resignedDate || null,
         relievedDate: requestBody.relievedDate || null,
@@ -108,6 +108,15 @@ const createEmployee = async (event) => {
       )
     ) {
       throw new Error("Incorrect BranchOffice");
+    }
+    if (requestBody.designation === null || !["Software Engineer Trainee", "Software Engineer", "Senior Software Engineer", 
+                                             "Testing Engineer Trainee", "Testing Engineer", "Senior Testing Engineer", 
+                                             "Tech Lead", "Testing Lead", "Manager", "Project Manager", "Senior Manager", 
+                                             "Analyst", "Senior Analyst", "Architect", "Senior Architect", "Solution Architect", 
+                                             "Scrum Master", "Data Engineer"].includes(
+    requestBody.designation)
+    ) { 
+      throw new Error("Incorrect Designation!");
     }
 
     const highestSerialNumber1 = await getHighestSerialNumber();
@@ -152,6 +161,11 @@ const createEmployee = async (event) => {
         branchOffice: requestBody.branchOffice,
         designation: requestBody.designation,
         onsite: onsite,
+        department: requestBody.department || null,
+        framework: requestBody.framework || null,
+        coreTechnology: requestBody.coreTechnology || null,
+        reportingManager: requestBody.reportingManager || null,
+        billableResource: requestBody.billableResource || null,
         createdDateTime: formattedDate,
       }),
     };

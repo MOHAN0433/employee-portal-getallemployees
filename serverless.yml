@@ -70,6 +70,15 @@ functions:
       - http:
           path: assignment
           method: POST
+  assignmentUpdate:
+    handler: src/Lamda/assignment/assignmentHandler.updateAssignment
+    name: assignmentUpdate
+    memorySize: 128
+    timeout: 120
+    events:
+      - http:
+          path: assignment/{employeeId}
+          method: PUT
 resources:
   Resources:
     EmployeeTable:

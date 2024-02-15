@@ -15,7 +15,9 @@ const httpStatusCodes = {
     EMPLOYEE_DETAILS_NOT_FOUND: "Employee details not found.",
     EMPLOYEE_ID_REQUIRED: "Employee Id is required",
     SUCCESSFULLY_CREATED_ASSIGNMENT_DETAILS : "Successfully created Assignment details.",
-    FAILED_TO_CREATE_ASSIGNMENT_DETAILS : "Failed to create Assignment details."
+    FAILED_TO_CREATE_ASSIGNMENT_DETAILS : "Failed to create Assignment details.",
+    SUCCESSFULLY_UPDATED_EMPLOYEE_DETAILS: "Successfully updated Assignment details.",
+    FAILED_TO_UPDATED_EMPLOYEE_DETAILS: "Failed to update Assignment details."
   };
   
   module.exports = {
